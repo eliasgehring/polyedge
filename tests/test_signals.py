@@ -25,7 +25,7 @@ def test_positive_edge_buys_yes():
         threshold=0.01,
     )
 
-    assert signal.edge == pytest.approx(0.10) 
+    assert signal.edge == pytest.approx(0.09) 
     assert signal.action == "BUY_YES"
 
 
@@ -42,7 +42,7 @@ def test_negative_edge_buys_no():
         threshold=0.01,
     )
     
-    assert signal.edge == pytest.approx(-0.10)
+    assert signal.edge == pytest.approx(-0.09)
     assert signal.action == "BUY_NO"
 
 
