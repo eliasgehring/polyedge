@@ -1,26 +1,59 @@
+from domain import ResolvedOutcome
 from features import compute_midpoint
 from portfolio import close_position
 from positions import get_yes_size, get_no_size
 
 
-def check_exit_conditions(portfolio, market):
+def get_resolved_outcome(market):
     """
-    Event-native version:
-    Exit only when the market resolves to 0 or 1.
+    Return the event outcome implied by the resolved market price.
+
+    YES_TRUE means the YES contract settled to 1.
+    YES_FALSE means the YES contract settled to 0.
+
+    This is deliberately separate from which position side we close.
     """
 
     midpoint = compute_midpoint(market.best_bid, market.best_ask)
-    
-    if midpoint <= 0.01 or midpoint >= 0.99:
-        yes_size = get_yes_size(portfolio, market.market_id)
-        no_size = get_no_size(portfolio, market.market_id)
 
-        if yes_size > 0:
-            realized_pnl = close_position(portfolio, market, "YES")
-            return True, "market resolved YES", "YES", realized_pnl
+    if midpoint >= 0.99:
+        return ResolvedOutcome.YES_TRUE
 
-        if no_size > 0:
-            realized_pnl = close_position(portfolio, market, "NO")
-            return True, "market resolved NO", "NO", realized_pnl
+    if midpoint <= 0.01:
+        return ResolvedOutcome.YES_FALSE
 
-    return False, "no exit", "", 0.0
+    return None
+
+
+def check_exit_conditions(portfolio, market):
+    """
+    Legacy-compatible exit wrapper.
+
+    Returns:
+        exit_triggered: bool
+        exit_reason: str
+        exit_side: str
+        realized_pnl: float
+
+    Important semantics:
+    - exit_reason describes the event outcome.
+    - exit_side describes the side of the position that was closed.
+    """
+
+    resolved_outcome = get_resolved_outcome(market)
+
+    if resolved_outcome is None:
+        return False, "no exit", "", 0.0
+
+    yes_size = get_yes_size(portfolio, market.market_id)
+    no_size = get_no_size(portfolio, market.market_id)
+
+    if yes_size > 0:
+        realized_pnl = close_position(portfolio, market, "YES")
+        return True, f"market resolved {resolved_outcome.value}", "YES", realized_pnl
+
+    if no_size > 0:
+        realized_pnl = close_position(portfolio, market, "NO")
+        return True, f"market resolved {resolved_outcome.value}", "NO", realized_pnl
+
+    return False, "resolved but no open position", "", 0.0
