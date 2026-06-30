@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+
+# OS/editor
+.DS_Store
+.vscode/
+.idea/
+
+# Secrets
+.env
+*.env
+
+# Generated / large data
+data/raw/
+data/intermediate/
+data/final/
+data/diagnostics/
+results/logs/
+results/tables/
+results/figures/
+
+# Keep intentional sample/report files
+!data/sample/
+!data/sample/*.csv
+!reports/
+!reports/*.md
+
+# Old archived experiment outputs
+data/archive/
