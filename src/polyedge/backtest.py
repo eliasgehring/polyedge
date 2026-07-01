@@ -1,5 +1,7 @@
 import os
 
+from .domain import BacktestResult
+
 from .config import (
     STARTING_CASH,
     THRESHOLD,
@@ -274,6 +276,20 @@ def run_simulation(
 )
     print(f"\nRun log saved to: {log_filepath}")
 
+    return BacktestResult(
+        result_status=RESULT_STATUS,
+        dataset_path=str(historical_filepath),
+        total_trades=total_trades,
+        buy_yes_count=buy_yes_count,
+        buy_no_count=buy_no_count,
+        hold_count=hold_count,
+        risk_rejection_count=risk_rejection_count,
+        start_value=STARTING_CASH,
+        final_value=final_value,
+        total_return=final_value - STARTING_CASH,
+        peak_value=peak_value,
+        max_drawdown=max_drawdown,
+    )
 
 if __name__ == "__main__":
     run_simulation()

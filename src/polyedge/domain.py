@@ -99,6 +99,21 @@ class ExecutionAssumption:
     includes_fees: bool
     tradability_claim: bool
 
+@dataclass(frozen=True)
+class BacktestResult:
+    result_status: str
+    dataset_path: str
+    total_trades: int
+    buy_yes_count: int
+    buy_no_count: int
+    hold_count: int
+    risk_rejection_count: int
+    start_value: float
+    final_value: float
+    total_return: float
+    peak_value: float
+    max_drawdown: float
+
 
 CURRENT_EXECUTION_ASSUMPTION = ExecutionAssumption(
     mode=ExecutionMode.SYNTHETIC_BID_ASK,
