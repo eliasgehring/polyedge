@@ -6,7 +6,7 @@ from portfolio import (
     compute_side_unrealized_pnl,
 )
 from config import STARTING_CASH
-from positions import (
+from portfolio import (
     get_yes_size,
     get_no_size,
     get_yes_avg_price,

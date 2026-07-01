@@ -1,5 +1,5 @@
 from models import Signal, Portfolio
-from positions import has_open_position
+from portfolio import has_open_position
 
 
 def get_trade_decision(signal: Signal, portfolio: Portfolio, max_position_size: float):

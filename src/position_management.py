@@ -1,7 +1,6 @@
 from domain import ResolvedOutcome
 from features import compute_midpoint
-from portfolio import close_position
-from positions import get_yes_size, get_no_size
+from portfolio import close_position, get_yes_size, get_no_size
 
 
 def get_resolved_outcome(market):
