@@ -1,4 +1,4 @@
-from run_backtest import run_simulation
+from backtest import run_simulation
 
 
 THRESHOLDS = [
