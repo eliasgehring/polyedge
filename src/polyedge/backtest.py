@@ -73,6 +73,7 @@ def run_simulation(
     edge_size_multiplier=None,
     historical_filepath=None,
     write_logs=True,
+    print_output=True,
 ):
     portfolio = create_portfolio(STARTING_CASH)
 
@@ -103,7 +104,8 @@ def run_simulation(
     dataset_hash = file_sha256(historical_filepath)
 
     historical_data = load_historical_data(historical_filepath)
-    print_data_load_summary(historical_filepath, historical_data)
+    if print_output:
+        print_data_load_summary(historical_filepath, historical_data)
 
     total_trades = 0
     buy_yes_count = 0
@@ -263,7 +265,8 @@ def run_simulation(
 
     final_value = compute_portfolio_value(portfolio, latest_market_state_by_id)
 
-    report_summary(
+    if print_output:
+        report_summary(
         total_trades,
         buy_yes_count,
         buy_no_count,

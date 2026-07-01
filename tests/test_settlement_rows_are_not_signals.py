@@ -10,6 +10,7 @@ def test_settlement_rows_without_positions_are_not_entry_signals():
         edge_size_multiplier=500,
         historical_filepath=SAMPLE_HISTORICAL_DATA_FILE,
         write_logs=False,
+        print_output=False,
     )
 
     assert result.total_trades == 0

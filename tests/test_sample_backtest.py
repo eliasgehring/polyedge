@@ -10,6 +10,7 @@ def test_sample_backtest_is_deterministic():
         edge_size_multiplier=500,
         historical_filepath=SAMPLE_HISTORICAL_DATA_FILE,
         write_logs = False,
+        print_output=False,
     )
 
     assert result.result_status == "MECHANICALLY_VALID_SYNTHETIC_BACKTEST"
@@ -27,3 +28,4 @@ def test_sample_backtest_is_deterministic():
     assert result.dataset_settlement_rows == 2
     assert result.dataset_hard_fail is False
     assert result.skipped_settlement_count == 0
+        

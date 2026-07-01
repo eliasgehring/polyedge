@@ -10,6 +10,7 @@ def test_report_builds_markdown_for_sample_backtest():
         edge_size_multiplier=500,
         historical_filepath=SAMPLE_HISTORICAL_DATA_FILE,
         write_logs = False,
+        print_output=False,
     )
 
     report = build_markdown_report(result)
