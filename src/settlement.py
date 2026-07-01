@@ -1,5 +1,5 @@
 from domain import ResolvedOutcome
-from features import compute_midpoint
+from pricing import compute_midpoint
 from portfolio import close_position, get_yes_size, get_no_size
 
 

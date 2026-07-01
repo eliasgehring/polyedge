@@ -7,7 +7,7 @@ sys.path.insert(0, str(SRC))
 
 from models import Fill, MarketState
 from portfolio import apply_fill, create_portfolio
-from position_management import check_exit_conditions
+from settlement import check_exit_conditions
 
 
 def test_buy_no_closed_when_yes_resolves_reports_event_outcome_yes_true():

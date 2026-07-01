@@ -1,5 +1,5 @@
 from models import Portfolio, Fill, MarketState
-from features import compute_midpoint
+from pricing import compute_midpoint
 
 
 def empty_market_position() -> dict:

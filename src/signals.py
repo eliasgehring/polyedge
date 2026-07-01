@@ -1,5 +1,5 @@
 from models import MarketState, Signal
-from features import compute_midpoint
+from pricing import compute_midpoint
 from config import (
     MIN_MARKET_PROB,
     MAX_MARKET_PROB,

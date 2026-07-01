@@ -22,7 +22,7 @@ from risk import get_trade_decision
 from execution import simulate_fill
 from reporting import print_header, report_state, report_summary
 from log_backtest import initialize_csv_log, log_step_to_csv
-from position_management import check_exit_conditions
+from settlement import check_exit_conditions
 from track_experiments import log_run_metadata,file_sha256
 from sizing import compute_trade_size
 from portfolio_validation import validate_portfolio_state
