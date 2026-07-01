@@ -1,6 +1,6 @@
-from legacy_models import Fill, MarketState
-from portfolio import apply_fill, create_portfolio
-from settlement import check_exit_conditions
+from polyedge.legacy_models import Fill, MarketState
+from polyedge.portfolio import apply_fill, create_portfolio
+from polyedge.settlement import check_exit_conditions
 
 
 def test_buy_no_closed_when_yes_resolves_reports_event_outcome_yes_true():

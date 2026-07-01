@@ -1,6 +1,6 @@
 import pytest
 
-from metrics import (
+from polyedge.metrics import (
     compute_equity_metrics,
     compute_max_drawdown,
     compute_step_returns,

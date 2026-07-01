@@ -1,4 +1,4 @@
-from domain import MarketSnapshot, RowType, Signal, Side
+from .domain import MarketSnapshot, RowType, Signal, Side
 
 
 def midpoint(bid: float, ask: float) -> float:

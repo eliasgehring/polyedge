@@ -1,5 +1,5 @@
-from legacy_models import Signal
-from sizing import compute_trade_size
+from polyedge.legacy_models import Signal
+from polyedge.sizing import compute_trade_size
 
 
 def test_hold_signal_has_zero_size():

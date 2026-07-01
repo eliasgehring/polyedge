@@ -1,5 +1,5 @@
-from legacy_models import Portfolio, MarketState
-from portfolio import compute_portfolio_value
+from polyedge.legacy_models import Portfolio, MarketState
+from polyedge.portfolio import compute_portfolio_value
 
 
 def test_latest_market_state_book_keeps_stale_market_values():

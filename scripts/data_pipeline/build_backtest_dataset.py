@@ -1,7 +1,7 @@
 import os
 import csv
 
-from paths import (
+from polyedge.paths import (
     HISTORICAL_READY_DIR,
     HISTORICAL_DATA_FILE,
     ensure_parent_dir,
@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "src"
 sys.path.insert(0, str(SRC))
 
-from backtest import run_simulation
+from polyedge.backtest import run_simulation
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

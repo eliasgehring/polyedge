@@ -1,8 +1,8 @@
 import pytest
 
-from legacy_models import MarketState, Signal
-from execution import simulate_fill
-from config import BASE_SLIPPAGE, SIZE_IMPACT
+from polyedge.legacy_models import MarketState, Signal
+from polyedge.execution import simulate_fill
+from polyedge.config import BASE_SLIPPAGE, SIZE_IMPACT
 
 
 def test_buy_yes_executes_at_yes_ask_plus_slippage():

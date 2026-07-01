@@ -1,4 +1,4 @@
-from backtest import run_simulation
+from polyedge.backtest import run_simulation
 
 
 THRESHOLDS = [

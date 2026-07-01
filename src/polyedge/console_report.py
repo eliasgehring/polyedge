@@ -1,12 +1,12 @@
-from legacy_models import Portfolio, MarketState
-from pricing import compute_midpoint, compute_spread
-from portfolio import (
+from .legacy_models import Portfolio, MarketState
+from .pricing import compute_midpoint, compute_spread
+from .portfolio import (
     compute_portfolio_value,
     compute_unrealized_pnl,
     compute_side_unrealized_pnl,
 )
-from config import STARTING_CASH
-from portfolio import (
+from .config import STARTING_CASH
+from .portfolio import (
     get_yes_size,
     get_no_size,
     get_yes_avg_price,

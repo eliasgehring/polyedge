@@ -11,7 +11,7 @@ from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
 
 
-from paths import (
+from polyedge.paths import (
     BOOKMAKER_SOURCE_DIR,
     HISTORICAL_READY_DIR,
     POLYMARKET_REVIEW_FILE,
@@ -26,7 +26,7 @@ ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "src"
 sys.path.insert(0, str(SRC))
 
-from backtest import run_simulation
+from polyedge.backtest import run_simulation
 
 
 SOURCE_DIR = BOOKMAKER_SOURCE_DIR

@@ -1,4 +1,4 @@
-from data_validation import build_diagnostics
+from polyedge.data_validation import build_diagnostics
 
 
 def valid_rows():

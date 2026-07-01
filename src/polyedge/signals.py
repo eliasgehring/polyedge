@@ -1,11 +1,11 @@
-from legacy_models import MarketState, Signal
-from pricing import compute_midpoint
-from config import (
+from .legacy_models import MarketState, Signal
+from .pricing import compute_midpoint
+from .config import (
     MIN_MARKET_PROB,
     MAX_MARKET_PROB,
 )
-from domain import MarketSnapshot, RowType, Side
-from probability import generate_signal as generate_probability_signal
+from .domain import MarketSnapshot, RowType, Side
+from .probability import generate_signal as generate_probability_signal
 
 
 def generate_signal(

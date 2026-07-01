@@ -1,5 +1,5 @@
-from legacy_models import Portfolio, MarketState, Fill
-from portfolio import (
+from polyedge.legacy_models import Portfolio, MarketState, Fill
+from polyedge.portfolio import (
     create_portfolio,
     apply_fill,
     close_position,

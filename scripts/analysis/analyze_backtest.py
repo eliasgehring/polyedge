@@ -10,9 +10,9 @@ ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "src"
 sys.path.insert(0, str(SRC))
 
-from backtest import run_simulation
+from polyedge.backtest import run_simulation
 
-from paths import (
+from polyedge.paths import (
     PROJECT_ROOT,
     RESULT_LOGS_DIR,
     RUN_METADATA_FILE,

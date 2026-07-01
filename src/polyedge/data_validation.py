@@ -3,7 +3,7 @@ import json
 from collections import Counter, defaultdict
 from datetime import datetime
 
-from paths import (
+from .paths import (
     HISTORICAL_DATA_FILE,
     DATASET_DIAGNOSTICS_FILE,
     ensure_parent_dir,

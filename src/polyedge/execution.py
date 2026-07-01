@@ -1,5 +1,5 @@
-from legacy_models import Signal, MarketState, Fill
-from config import (
+from .legacy_models import Signal, MarketState, Fill
+from .config import (
     BASE_SLIPPAGE,
     SIZE_IMPACT
 )

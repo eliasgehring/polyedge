@@ -1,7 +1,7 @@
 import pytest
 
-from domain import MarketSnapshot, RowType, Side
-from probability import generate_signal
+from polyedge.domain import MarketSnapshot, RowType, Side
+from polyedge.probability import generate_signal
 
 
 def test_positive_executable_yes_edge_buys_yes():

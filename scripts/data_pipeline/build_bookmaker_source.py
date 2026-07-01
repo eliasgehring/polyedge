@@ -3,7 +3,7 @@ import os
 import re
 from datetime import datetime, timedelta
 
-from paths import (
+from polyedge.paths import (
     NBA_RAW_DIR,
     BOOKMAKER_SOURCE_DIR,
     ensure_dir,
@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "src"
 sys.path.insert(0, str(SRC))
 
-from backtest import run_simulation
+from polyedge.backtest import run_simulation
 
 RAW_DIR = NBA_RAW_DIR
 OUTPUT_DIR = BOOKMAKER_SOURCE_DIR

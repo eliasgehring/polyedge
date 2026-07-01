@@ -1,5 +1,5 @@
-from legacy_models import Portfolio, Signal
-from risk import get_trade_decision
+from polyedge.legacy_models import Portfolio, Signal
+from polyedge.risk import get_trade_decision
 
 
 def test_rejects_trade_when_market_already_has_open_position():

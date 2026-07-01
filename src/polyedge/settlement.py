@@ -1,6 +1,6 @@
-from domain import ResolvedOutcome
-from pricing import compute_midpoint
-from portfolio import close_position, get_yes_size, get_no_size
+from .domain import ResolvedOutcome
+from .pricing import compute_midpoint
+from .portfolio import close_position, get_yes_size, get_no_size
 
 
 def get_resolved_outcome(market):
