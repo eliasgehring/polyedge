@@ -13,7 +13,7 @@ It is not a live-trading claim.
 Dataset path:
 
 ```text
-/Users/elias/dev/Python/polymarkets edit version/data/sample/historical_sample.csv
+data/sample/historical_sample.csv
 ```
 
 ## Execution Assumptions

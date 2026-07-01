@@ -1,4 +1,5 @@
 from pathlib import Path
+from .paths import PROJECT_ROOT
 
 from .domain import BacktestResult, CURRENT_EXECUTION_ASSUMPTION
 
@@ -6,6 +7,14 @@ from .domain import BacktestResult, CURRENT_EXECUTION_ASSUMPTION
 def format_pct(value: float) -> str:
     return f"{value * 100:.2f}%"
 
+
+def display_path(path_value: str) -> str:
+    path = Path(path_value).resolve()
+
+    try:
+        return str(path.relative_to(PROJECT_ROOT))
+    except ValueError:
+        return str(path_value)
 
 def build_markdown_report(result: BacktestResult) -> str:
     assumption = CURRENT_EXECUTION_ASSUMPTION
@@ -30,7 +39,7 @@ def build_markdown_report(result: BacktestResult) -> str:
         "Dataset path:",
         "",
         "```text",
-        str(result.dataset_path),
+        display_path(result.dataset_path),
         "```",
         "",
         "## Execution Assumptions",
