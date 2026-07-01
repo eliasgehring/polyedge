@@ -3,6 +3,15 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+SRC = ROOT / "src"
+sys.path.insert(0, str(SRC))
+
+from run_backtest import run_simulation
+
 from paths import (
     PROJECT_ROOT,
     RESULT_LOGS_DIR,
