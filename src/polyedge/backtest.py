@@ -12,7 +12,6 @@ from .config import (
 )
 
 from .paths import (
-    PROJECT_ROOT,
     HISTORICAL_DATA_FILE,
     RESULT_LOGS_DIR,
     RUN_METADATA_FILE,
@@ -25,7 +24,7 @@ from .execution import simulate_fill
 from .console_report import print_header, report_state, report_summary
 from .run_log import initialize_csv_log, log_step_to_csv
 from .settlement import check_exit_conditions
-from .experiment_tracking import log_run_metadata,file_sha256
+from .experiment_tracking import log_run_metadata, file_sha256
 from .sizing import compute_trade_size
 from .portfolio_validation import validate_portfolio_state
 from .data_validation import load_rows, build_diagnostics
@@ -73,7 +72,7 @@ def run_simulation(
     threshold=None,
     edge_size_multiplier=None,
     historical_filepath=None,
-    write_logs= True,
+    write_logs=True,
 ):
     portfolio = create_portfolio(STARTING_CASH)
 
@@ -266,21 +265,21 @@ def run_simulation(
     
     if write_logs:
         log_run_metadata(
-        RUN_METADATA_FILE,
-    {
-        "run_file": os.path.basename(log_filepath),
-        "result_status": RESULT_STATUS,
-        "threshold": threshold_value,
-        "edge_size_multiplier": edge_multiplier_value,
-        "max_position_size": MAX_POSITION_SIZE,
-        "dataset_hash": file_sha256(historical_filepath),
-        "dataset_rows": diagnostics["rows"],
-        "dataset_markets": diagnostics["markets"],
-        "dataset_pregame_rows": diagnostics["pregame_rows"],
-        "dataset_settlement_rows": diagnostics["settlement_rows"],
-        "dataset_hard_fail": diagnostics["hard_fail"],
-    },
-)
+            RUN_METADATA_FILE,
+            {
+                "run_file": os.path.basename(log_filepath),
+                "result_status": RESULT_STATUS,
+                "threshold": threshold_value,
+                "edge_size_multiplier": edge_multiplier_value,
+                "max_position_size": MAX_POSITION_SIZE,
+                "dataset_hash": file_sha256(historical_filepath),
+                "dataset_rows": diagnostics["rows"],
+                "dataset_markets": diagnostics["markets"],
+                "dataset_pregame_rows": diagnostics["pregame_rows"],
+                "dataset_settlement_rows": diagnostics["settlement_rows"],
+                "dataset_hard_fail": diagnostics["hard_fail"],
+            }
+        )
     print(f"\nRun log saved to: {log_filepath}")
 
     return BacktestResult(
