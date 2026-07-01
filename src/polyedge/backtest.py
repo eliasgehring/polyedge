@@ -110,6 +110,7 @@ def run_simulation(
     buy_no_count = 0
     hold_count = 0
     risk_rejection_count = 0
+    skipped_settlement_count = 0
 
     peak_value = STARTING_CASH
     max_drawdown = 0.0
@@ -148,6 +149,14 @@ def run_simulation(
             approved = False
             reason = exit_reason
             validate_portfolio_state(portfolio)
+
+        elif row_type == "SETTLEMENT":
+            skipped_settlement_count += 1
+            approved = False
+            reason = "settlement row with no open position; no entry signal generated"
+
+            if VERBOSE:
+                print(reason)
 
         else:
             signal = generate_signal(
@@ -274,30 +283,39 @@ def run_simulation(
                 "threshold": threshold_value,
                 "edge_size_multiplier": edge_multiplier_value,
                 "max_position_size": MAX_POSITION_SIZE,
-                "dataset_hash": dataset_hash,               
+                "dataset_hash": dataset_hash,
                 "dataset_rows": diagnostics["rows"],
                 "dataset_markets": diagnostics["markets"],
                 "dataset_pregame_rows": diagnostics["pregame_rows"],
                 "dataset_settlement_rows": diagnostics["settlement_rows"],
                 "dataset_hard_fail": diagnostics["hard_fail"],
-            }
+            },
         )
-    print(f"\nRun log saved to: {log_filepath}")
+
+        print(f"\nRun log saved to: {log_filepath}")
 
     return BacktestResult(
         result_status=RESULT_STATUS,
         dataset_path=str(historical_filepath),
+        dataset_hash=dataset_hash,
+        dataset_rows=diagnostics["rows"],
+        dataset_markets=diagnostics["markets"],
+        dataset_pregame_rows=diagnostics["pregame_rows"],
+        dataset_settlement_rows=diagnostics["settlement_rows"],
+        dataset_hard_fail=diagnostics["hard_fail"],
         total_trades=total_trades,
         buy_yes_count=buy_yes_count,
         buy_no_count=buy_no_count,
         hold_count=hold_count,
         risk_rejection_count=risk_rejection_count,
+        skipped_settlement_count=skipped_settlement_count,
         start_value=STARTING_CASH,
         final_value=final_value,
         total_return=final_value - STARTING_CASH,
         peak_value=peak_value,
         max_drawdown=max_drawdown,
     )
+
 
 if __name__ == "__main__":
     run_simulation()

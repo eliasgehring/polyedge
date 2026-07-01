@@ -107,12 +107,14 @@ class BacktestResult:
     dataset_rows: int
     dataset_markets: int
     dataset_pregame_rows: int
-    dataset_har_fail: bool
+    dataset_settlement_rows: int
+    dataset_hard_fail: bool
     total_trades: int
     buy_yes_count: int
     buy_no_count: int
     hold_count: int
     risk_rejection_count: int
+    skipped_settlement_count: int
     start_value: float
     final_value: float
     total_return: float

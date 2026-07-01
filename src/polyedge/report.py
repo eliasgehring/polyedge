@@ -108,6 +108,7 @@ def build_markdown_report(result: BacktestResult) -> str:
         f"| BUY_NO trades | `{result.buy_no_count}` |",
         f"| HOLD signals | `{result.hold_count}` |",
         f"| Risk rejections | `{result.risk_rejection_count}` |",
+        f"| Skipped settlement rows | `{result.skipped_settlement_count}` |",
         "",
         "## Interpretation",
         "",

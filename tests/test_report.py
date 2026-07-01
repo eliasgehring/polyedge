@@ -26,3 +26,4 @@ def test_report_builds_markdown_for_sample_backtest():
     assert "Pregame rows" in report
     assert "Settlement rows" in report
     assert "Hard fail" in report
+    assert "Skipped settlement rows" in report

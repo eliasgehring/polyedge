@@ -51,6 +51,17 @@ Portfolio value is computed globally:
 total_value = cash + marked value of all open YES/NO positions
 ```
 
+## Dataset Integrity
+
+| Check | Value |
+|---|---:|
+| Dataset SHA256 | `d49df0bed53982b8992a4aa298c80027de53b729eabe113628f702bae2ff00f9` |
+| Rows | `4` |
+| Markets | `2` |
+| Pregame rows | `2` |
+| Settlement rows | `2` |
+| Hard fail | `False` |
+
 Open positions are marked using the latest known market state for each market, not merely the current row.
 
 ## Summary
@@ -68,6 +79,7 @@ Open positions are marked using the latest known market state for each market, n
 | BUY_NO trades | `1` |
 | HOLD signals | `0` |
 | Risk rejections | `0` |
+| Skipped settlement rows | `0` |
 
 ## Interpretation
 

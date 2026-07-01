@@ -26,3 +26,4 @@ def test_sample_backtest_is_deterministic():
     assert result.dataset_pregame_rows == 2
     assert result.dataset_settlement_rows == 2
     assert result.dataset_hard_fail is False
+    assert result.skipped_settlement_count == 0
