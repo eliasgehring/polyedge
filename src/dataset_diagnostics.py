@@ -111,6 +111,7 @@ def build_diagnostics(rows):
     missing_settlements = 0
     duplicate_pregame_markets = 0
     duplicate_settlement_markets = 0
+    settlement_not_after_pregame = 0
 
     for market_id, market_rows in rows_by_market.items():
         market_pregame_rows = [
@@ -124,6 +125,17 @@ def build_diagnostics(rows):
 
         if len(market_settlement_rows) == 0:
             missing_settlements += 1
+
+        if len(market_pregame_rows) == 1 and len(market_settlement_rows) == 1:
+            pregame_timestamp = parse_timestamp(market_pregame_rows[0].get("timestamp"))
+            settlement_timestamp = parse_timestamp(market_settlement_rows[0].get("timestamp"))
+
+            if (
+                pregame_timestamp is not None
+                and settlement_timestamp is not None
+                and settlement_timestamp <= pregame_timestamp
+            ):
+                settlement_not_after_pregame += 1
 
         if len(market_pregame_rows) > 1:
             duplicate_pregame_markets += 1
@@ -144,6 +156,7 @@ def build_diagnostics(rows):
         "bid_greater_than_ask": bid_greater_than_ask,
         "probability_out_of_bounds": probability_out_of_bounds,
         "invalid_row_type": invalid_row_type,
+        "settlement_not_after_pregame": settlement_not_after_pregame,
         "min_timestamp": min(timestamps).isoformat() if timestamps else None,
         "max_timestamp": max(timestamps).isoformat() if timestamps else None,
         "synthetic_bid_ask": True,
@@ -151,6 +164,7 @@ def build_diagnostics(rows):
 
     hard_fail_fields = [
         "missing_settlements",
+        "settlement_not_after_pregame",
         "duplicate_pregame_markets",
         "duplicate_settlement_markets",
         "bad_timestamps",

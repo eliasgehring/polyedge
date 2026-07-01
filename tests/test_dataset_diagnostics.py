@@ -98,9 +98,59 @@ def test_probability_out_of_bounds_hard_fails():
 def test_invalid_row_type_hard_fails():
     rows = valid_rows()
     rows[0]["row_type"] = "QUOTE"
-        
+
     diagnostics = build_diagnostics(rows)
-        
+
     assert diagnostics["invalid_row_type"] == 1
+    assert diagnostics["hard_fail"] is True
+
+def test_settlement_must_be_after_pregame():
+    rows = [
+        {
+            "timestamp": "2024-10-23T12:00:00",
+            "market_id": "market_a",
+            "best_bid": "0.49",
+            "best_ask": "0.51",
+            "bookmaker_prob": "0.55",
+            "row_type": "PREGAME",
+        },
+        {
+            "timestamp": "2024-10-23T12:00:00",
+            "market_id": "market_a",
+            "best_bid": "1.0",
+            "best_ask": "1.0",
+            "bookmaker_prob": "1.0",
+            "row_type": "SETTLEMENT",
+        },
+    ]
+
+    diagnostics = build_diagnostics(rows)
+
+    assert diagnostics["settlement_not_after_pregame"] == 1
+    assert diagnostics["hard_fail"] is True
+
+def test_settlement_before_pregame_hard_fails():
+    rows = [
+        {
+            "timestamp": "2024-10-23T12:00:00",
+            "market_id": "market_a",
+            "best_bid": "0.49",
+            "best_ask": "0.51",
+            "bookmaker_prob": "0.55",
+            "row_type": "PREGAME",
+        },
+        {
+            "timestamp": "2024-10-22T12:00:00",
+            "market_id": "market_a",
+            "best_bid": "1.0",
+            "best_ask": "1.0",
+            "bookmaker_prob": "1.0",
+            "row_type": "SETTLEMENT",
+        },
+    ]
+
+    diagnostics = build_diagnostics(rows)
+
+    assert diagnostics["settlement_not_after_pregame"] == 1
     assert diagnostics["hard_fail"] is True
 
