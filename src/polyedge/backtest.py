@@ -73,6 +73,7 @@ def run_simulation(
     threshold=None,
     edge_size_multiplier=None,
     historical_filepath=None,
+    write_logs= True,
 ):
     portfolio = create_portfolio(STARTING_CASH)
 
@@ -83,8 +84,12 @@ def run_simulation(
         else EDGE_SIZE_MULTIPLIER
     )
     
-    log_filepath = get_next_run_filepath()
-    initialize_csv_log(log_filepath)
+    log_filepath = None
+    
+    if write_logs:
+        log_filepath = get_next_run_filepath()
+        initialize_csv_log(log_filepath)
+
     if historical_filepath is None:
         historical_filepath = HISTORICAL_DATA_FILE
 
@@ -227,7 +232,8 @@ def run_simulation(
                 step_pnl=step_pnl,
             )
 
-        log_step_to_csv(
+        if write_logs:
+            log_step_to_csv(
             log_filepath,
             i + 1,
             timestamp,
@@ -258,7 +264,8 @@ def run_simulation(
         final_value,)
     
     
-    log_run_metadata(
+    if write_logs:
+        log_run_metadata(
         RUN_METADATA_FILE,
     {
         "run_file": os.path.basename(log_filepath),
