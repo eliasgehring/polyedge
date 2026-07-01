@@ -5,7 +5,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
 sys.path.insert(0, str(SRC))
 
-from dataset_diagnostics import build_diagnostics
+from data_validation import build_diagnostics
 
 
 def valid_rows():

@@ -25,8 +25,8 @@ from log_backtest import initialize_csv_log, log_step_to_csv
 from position_management import check_exit_conditions
 from track_experiments import log_run_metadata,file_sha256
 from sizing import compute_trade_size
-from validation import validate_portfolio_state
-from dataset_diagnostics import load_rows, build_diagnostics
+from portfolio_validation import validate_portfolio_state
+from data_validation import load_rows, build_diagnostics
 
 
 def get_next_run_filepath() -> str:
