@@ -4,6 +4,7 @@ import sys
 from .backtest import run_simulation
 from .data_validation import build_diagnostics, load_rows, print_diagnostics
 from .paths import SAMPLE_HISTORICAL_DATA_FILE
+from .report import save_markdown_report
 
 
 def validate_command(args) -> int:
@@ -23,11 +24,16 @@ def validate_command(args) -> int:
 
 
 def run_command(args) -> int:
-    run_simulation(
+    result = run_simulation(
         threshold=args.threshold,
         edge_size_multiplier=args.edge_size_multiplier,
         historical_filepath=args.dataset,
     )
+
+    if args.report:
+        save_markdown_report(result, args.report)
+        print(f"\nReport saved to: {args.report}")
+
     return 0
 
 
@@ -74,9 +80,24 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Position size multiplier applied to absolute edge.",
     )
+    run_parser.add_argument(
+        "--report",
+        default=None,
+        help="Optional path for a markdown report.",
+    )
     run_parser.set_defaults(func=run_command)
 
     return parser
+
+
+def main(argv=None) -> int:
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    return args.func(args)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv[1:]))
 
 
 def main(argv=None) -> int:
