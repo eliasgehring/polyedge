@@ -1,4 +1,4 @@
-from models import MarketState, Signal
+from legacy_models import MarketState, Signal
 from pricing import compute_midpoint
 from config import (
     MIN_MARKET_PROB,

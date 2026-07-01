@@ -1,4 +1,4 @@
-from models import Signal
+from legacy_models import Signal
 
 
 def compute_trade_size(

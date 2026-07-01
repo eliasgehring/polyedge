@@ -5,7 +5,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
 sys.path.insert(0, str(SRC))
 
-from models import Portfolio, MarketState
+from legacy_models import Portfolio, MarketState
 from portfolio import compute_portfolio_value
 
 

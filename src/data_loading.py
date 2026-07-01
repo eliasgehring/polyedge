@@ -1,7 +1,7 @@
 import csv
 from datetime import datetime
 
-from models import MarketState
+from legacy_models import MarketState
 
 
 def parse_timestamp(timestamp_str: str) -> datetime:

@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
 sys.path.insert(0, str(SRC))
 
-from models import MarketState, Signal
+from legacy_models import MarketState, Signal
 from execution import simulate_fill
 from config import BASE_SLIPPAGE, SIZE_IMPACT
 

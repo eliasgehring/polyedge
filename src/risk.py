@@ -1,4 +1,4 @@
-from models import Signal, Portfolio
+from legacy_models import Signal, Portfolio
 from portfolio import has_open_position
 
 
