@@ -19,3 +19,10 @@ def test_sample_backtest_is_deterministic():
     assert result.final_value == pytest.approx(1034.38)
     assert result.total_return == pytest.approx(34.38)
     assert result.max_drawdown == pytest.approx(1.62)
+
+    assert len(result.dataset_hash) == 64
+    assert result.dataset_rows == 4
+    assert result.dataset_markets == 2
+    assert result.dataset_pregame_rows == 2
+    assert result.dataset_settlement_rows == 2
+    assert result.dataset_hard_fail is False

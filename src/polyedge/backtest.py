@@ -100,6 +100,8 @@ def run_simulation(
         "Refusing to run backtest because dataset diagnostics failed."
     )
 
+    dataset_hash = file_sha256(historical_filepath)
+
     historical_data = load_historical_data(historical_filepath)
     print_data_load_summary(historical_filepath, historical_data)
 
@@ -272,7 +274,7 @@ def run_simulation(
                 "threshold": threshold_value,
                 "edge_size_multiplier": edge_multiplier_value,
                 "max_position_size": MAX_POSITION_SIZE,
-                "dataset_hash": file_sha256(historical_filepath),
+                "dataset_hash": dataset_hash,               
                 "dataset_rows": diagnostics["rows"],
                 "dataset_markets": diagnostics["markets"],
                 "dataset_pregame_rows": diagnostics["pregame_rows"],

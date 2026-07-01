@@ -20,3 +20,9 @@ def test_report_builds_markdown_for_sample_backtest():
     assert "Makes tradability claim" in report
     assert "data/sample/historical_sample.csv" in report
     assert str(PROJECT_ROOT) not in report
+
+    assert "## Dataset Integrity" in report
+    assert "Dataset SHA256" in report
+    assert "Pregame rows" in report
+    assert "Settlement rows" in report
+    assert "Hard fail" in report

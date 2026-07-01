@@ -103,6 +103,11 @@ class ExecutionAssumption:
 class BacktestResult:
     result_status: str
     dataset_path: str
+    dataset_hash: str
+    dataset_rows: int
+    dataset_markets: int
+    dataset_pregame_rows: int
+    dataset_har_fail: bool
     total_trades: int
     buy_yes_count: int
     buy_no_count: int

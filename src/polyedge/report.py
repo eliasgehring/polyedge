@@ -77,6 +77,17 @@ def build_markdown_report(result: BacktestResult) -> str:
         "total_value = cash + marked value of all open YES/NO positions",
         "```",
         "",
+                "## Dataset Integrity",
+        "",
+        "| Check | Value |",
+        "|---|---:|",
+        f"| Dataset SHA256 | `{result.dataset_hash}` |",
+        f"| Rows | `{result.dataset_rows}` |",
+        f"| Markets | `{result.dataset_markets}` |",
+        f"| Pregame rows | `{result.dataset_pregame_rows}` |",
+        f"| Settlement rows | `{result.dataset_settlement_rows}` |",
+        f"| Hard fail | `{result.dataset_hard_fail}` |",
+        "",
         (
             "Open positions are marked using the latest known market state for "
             "each market, not merely the current row."
