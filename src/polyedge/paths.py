@@ -15,6 +15,7 @@ RAW_DATA_DIR = DATA_DIR / "raw"
 INTERMEDIATE_DATA_DIR = DATA_DIR / "intermediate"
 DIAGNOSTICS_DIR = DATA_DIR / "diagnostics"
 FINAL_DATA_DIR = DATA_DIR / "final"
+SAMPLE_DATA_DIR = DATA_DIR / "sample"
 
 
 # Raw external data
@@ -42,6 +43,7 @@ DATASET_DIAGNOSTICS_FILE = DIAGNOSTICS_DIR / "dataset_diagnostics.json"
 
 HISTORICAL_DATA_DIR = FINAL_DATA_DIR
 HISTORICAL_DATA_FILE = HISTORICAL_DATA_DIR / "historical_data.csv"
+SAMPLE_HISTORICAL_DATA_FILE = SAMPLE_DATA_DIR / "historical_sample.csv"
 
 
 # Result directories

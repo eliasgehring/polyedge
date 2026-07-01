@@ -70,6 +70,7 @@ def print_data_load_summary(historical_filepath: str, historical_data) -> None:
 def run_simulation(
     threshold=None,
     edge_size_multiplier=None,
+    historical_filepath=None,
 ):
     portfolio = create_portfolio(STARTING_CASH)
 
@@ -82,7 +83,8 @@ def run_simulation(
     
     log_filepath = get_next_run_filepath()
     initialize_csv_log(log_filepath)
-    historical_filepath = HISTORICAL_DATA_FILE
+    if historical_filepath is None:
+        historical_filepath = HISTORICAL_DATA_FILE
 
     diagnostic_rows = load_rows(historical_filepath)
     diagnostics = build_diagnostics(diagnostic_rows)

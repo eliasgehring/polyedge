@@ -3,7 +3,7 @@ import sys
 
 from .backtest import run_simulation
 from .data_validation import build_diagnostics, load_rows, print_diagnostics
-from .paths import HISTORICAL_DATA_FILE
+from .paths import SAMPLE_HISTORICAL_DATA_FILE
 
 
 def validate_command(args) -> int:
@@ -26,6 +26,7 @@ def run_command(args) -> int:
     run_simulation(
         threshold=args.threshold,
         edge_size_multiplier=args.edge_size_multiplier,
+        historical_filepath=args.dataset,
     )
     return 0
 
@@ -47,14 +48,19 @@ def build_parser() -> argparse.ArgumentParser:
     )
     validate_parser.add_argument(
         "--dataset",
-        default=HISTORICAL_DATA_FILE,
-        help=f"Dataset CSV path. Default: {HISTORICAL_DATA_FILE}",
+        default=SAMPLE_HISTORICAL_DATA_FILE,
+        help=f"Dataset CSV path. Default: {SAMPLE_HISTORICAL_DATA_FILE}",
     )
     validate_parser.set_defaults(func=validate_command)
 
     run_parser = subparsers.add_parser(
         "run",
         help="Run the configured backtest.",
+    )
+    run_parser.add_argument(
+        "--dataset",
+        default=SAMPLE_HISTORICAL_DATA_FILE,
+        help=f"Dataset CSV path. Default: {SAMPLE_HISTORICAL_DATA_FILE}",
     )
     run_parser.add_argument(
         "--threshold",

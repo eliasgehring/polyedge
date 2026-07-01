@@ -1,0 +1,5 @@
+timestamp,market_id,best_bid,best_ask,bookmaker_prob,row_type
+2025-01-01T12:00:00,sample_yes_win,0.49,0.51,0.62,PREGAME
+2025-01-01T12:05:00,sample_no_win,0.69,0.71,0.55,PREGAME
+2025-01-02T12:00:00,sample_yes_win,1.0,1.0,1.0,SETTLEMENT
+2025-01-02T12:05:00,sample_no_win,0.0,0.0,0.0,SETTLEMENT
