@@ -122,6 +122,7 @@ def report_summary(
     buy_no_count: int,
     hold_count: int,
     risk_rejection_count: int,
+    skipped_settlement_count: int,
     peak_value: float,
     max_drawdown: float,
     final_value: float
@@ -139,5 +140,6 @@ def report_summary(
     print(f"BUY_NO         : {buy_no_count}")
     print(f"HOLD Signals   : {hold_count}")
     print(f"Risk Rejected  : {risk_rejection_count}")
+    print(f"Skipped Settle : {skipped_settlement_count}")
     print(f"Peak Value     : {peak_value:.3f}")
     print(f"Max Drawdown   : {max_drawdown:.3f}")

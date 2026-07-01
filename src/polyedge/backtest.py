@@ -272,6 +272,7 @@ def run_simulation(
         buy_no_count,
         hold_count,
         risk_rejection_count,
+        skipped_settlement_count,
         peak_value,
         max_drawdown,
         final_value,)
