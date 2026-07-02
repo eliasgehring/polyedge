@@ -59,6 +59,7 @@ def test_duplicate_pregame_hard_fails():
             "best_bid": "0.50",
             "best_ask": "0.52",
             "bookmaker_prob": "0.56",
+            "row_type": "PREGAME",
         },
     )
 
@@ -147,3 +148,106 @@ def test_settlement_before_pregame_hard_fails():
     assert diagnostics["settlement_not_after_pregame"] == 1
     assert diagnostics["hard_fail"] is True
 
+def test_missing_pregame_hard_fails():
+    rows = [
+        {
+            "timestamp": "2025-01-02T12:00:00",
+            "market_id": "market_1",
+            "best_bid": "1.0",
+            "best_ask": "1.0",
+            "bookmaker_prob": "1.0",
+            "row_type": "SETTLEMENT",
+        }
+    ]
+
+    diagnostics = build_diagnostics(rows)
+
+    assert diagnostics["missing_pregames"] == 1
+    assert diagnostics["hard_fail"] is True
+
+
+def test_unresolved_settlement_price_hard_fails():
+    rows = [
+        {
+            "timestamp": "2025-01-01T12:00:00",
+            "market_id": "market_1",
+            "best_bid": "0.49",
+            "best_ask": "0.51",
+            "bookmaker_prob": "0.60",
+            "row_type": "PREGAME",
+        },
+        {
+            "timestamp": "2025-01-02T12:00:00",
+            "market_id": "market_1",
+            "best_bid": "0.45",
+            "best_ask": "0.55",
+            "bookmaker_prob": "1.0",
+            "row_type": "SETTLEMENT",
+        },
+    ]
+
+    diagnostics = build_diagnostics(rows)
+
+    assert diagnostics["invalid_settlement_prices"] == 1
+    assert diagnostics["hard_fail"] is True
+
+
+def test_resolved_yes_settlement_passes():
+    rows = [
+        {
+            "timestamp": "2025-01-01T12:00:00",
+            "market_id": "market_1",
+            "best_bid": "0.49",
+            "best_ask": "0.51",
+            "bookmaker_prob": "0.60",
+            "row_type": "PREGAME",
+        },
+        {
+            "timestamp": "2025-01-02T12:00:00",
+            "market_id": "market_1",
+            "best_bid": "1.0",
+            "best_ask": "1.0",
+            "bookmaker_prob": "1.0",
+            "row_type": "SETTLEMENT",
+        },
+    ]
+
+    diagnostics = build_diagnostics(rows)
+
+    assert diagnostics["invalid_settlement_prices"] == 0
+    assert diagnostics["hard_fail"] is False
+
+
+def test_resolved_no_settlement_passes():
+    rows = [
+        {
+            "timestamp": "2025-01-01T12:00:00",
+            "market_id": "market_1",
+            "best_bid": "0.49",
+            "best_ask": "0.51",
+            "bookmaker_prob": "0.60",
+            "row_type": "PREGAME",
+        },
+        {
+            "timestamp": "2025-01-02T12:00:00",
+            "market_id": "market_1",
+            "best_bid": "0.0",
+            "best_ask": "0.0",
+            "bookmaker_prob": "0.0",
+            "row_type": "SETTLEMENT",
+        },
+    ]
+
+    diagnostics = build_diagnostics(rows)
+
+    assert diagnostics["invalid_settlement_prices"] == 0
+    assert diagnostics["hard_fail"] is False
+
+def test_missing_row_type_hard_fails():
+    rows = valid_rows()
+    rows[0].pop("row_type")
+
+    diagnostics = build_diagnostics(rows)
+
+    assert diagnostics["invalid_row_type"] == 1
+    assert diagnostics["hard_fail"] is True

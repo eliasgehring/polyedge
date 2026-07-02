@@ -103,32 +103,49 @@ def build_diagnostics(rows):
         if not (0.0 <= bookmaker_prob <= 1.0):
             probability_out_of_bounds += 1
 
-        if is_settlement_row(row):
-            settlement_rows.append(row)
-        else:
+        if row_type == "PREGAME":
             pregame_rows.append(row)
+        elif row_type == "SETTLEMENT":
+            settlement_rows.append(row)
 
+    missing_pregames = 0
     missing_settlements = 0
     duplicate_pregame_markets = 0
     duplicate_settlement_markets = 0
     settlement_not_after_pregame = 0
+    invalid_settlement_prices = 0
 
     for market_id, market_rows in rows_by_market.items():
         market_pregame_rows = [
-            row for row in market_rows
-            if not is_settlement_row(row)
+            row
+            for row in market_rows
+            if str(row.get("row_type", "")).strip().upper() == "PREGAME"
         ]
         market_settlement_rows = [
-            row for row in market_rows
-            if is_settlement_row(row)
+            row
+            for row in market_rows
+            if str(row.get("row_type", "")).strip().upper() == "SETTLEMENT"
         ]
+
+        if len(market_pregame_rows) == 0:
+            missing_pregames += 1
 
         if len(market_settlement_rows) == 0:
             missing_settlements += 1
 
+        if len(market_pregame_rows) > 1:
+            duplicate_pregame_markets += 1
+
+        if len(market_settlement_rows) > 1:
+            duplicate_settlement_markets += 1
+
         if len(market_pregame_rows) == 1 and len(market_settlement_rows) == 1:
-            pregame_timestamp = parse_timestamp(market_pregame_rows[0].get("timestamp"))
-            settlement_timestamp = parse_timestamp(market_settlement_rows[0].get("timestamp"))
+            pregame_timestamp = parse_timestamp(
+                market_pregame_rows[0].get("timestamp")
+            )
+            settlement_timestamp = parse_timestamp(
+                market_settlement_rows[0].get("timestamp")
+            )
 
             if (
                 pregame_timestamp is not None
@@ -137,17 +154,29 @@ def build_diagnostics(rows):
             ):
                 settlement_not_after_pregame += 1
 
-        if len(market_pregame_rows) > 1:
-            duplicate_pregame_markets += 1
+        for settlement_row in market_settlement_rows:
+            settlement_bid = parse_float(settlement_row.get("best_bid"))
+            settlement_ask = parse_float(settlement_row.get("best_ask"))
 
-        if len(market_settlement_rows) > 1:
-            duplicate_settlement_markets += 1
+            if settlement_bid is None or settlement_ask is None:
+                continue
+
+            settlement_midpoint = (
+                settlement_bid + settlement_ask
+            ) / 2.0
+
+            resolved_yes = settlement_midpoint >= 0.99
+            resolved_no = settlement_midpoint <= 0.01
+
+            if not (resolved_yes or resolved_no):
+                invalid_settlement_prices += 1
 
     diagnostics = {
         "rows": len(rows),
         "markets": len(market_counts),
         "pregame_rows": len(pregame_rows),
         "settlement_rows": len(settlement_rows),
+        "missing_pregames": missing_pregames,
         "missing_settlements": missing_settlements,
         "duplicate_pregame_markets": duplicate_pregame_markets,
         "duplicate_settlement_markets": duplicate_settlement_markets,
@@ -157,14 +186,17 @@ def build_diagnostics(rows):
         "probability_out_of_bounds": probability_out_of_bounds,
         "invalid_row_type": invalid_row_type,
         "settlement_not_after_pregame": settlement_not_after_pregame,
+        "invalid_settlement_prices": invalid_settlement_prices,
         "min_timestamp": min(timestamps).isoformat() if timestamps else None,
         "max_timestamp": max(timestamps).isoformat() if timestamps else None,
         "synthetic_bid_ask": True,
     }
 
     hard_fail_fields = [
+        "missing_pregames",
         "missing_settlements",
         "settlement_not_after_pregame",
+        "invalid_settlement_prices",
         "duplicate_pregame_markets",
         "duplicate_settlement_markets",
         "bad_timestamps",
@@ -175,11 +207,11 @@ def build_diagnostics(rows):
     ]
 
     diagnostics["hard_fail"] = any(
-        diagnostics[field] > 0 for field in hard_fail_fields
+        diagnostics[field] > 0
+        for field in hard_fail_fields
     )
 
     return diagnostics
-
 
 def save_diagnostics(diagnostics):
     ensure_parent_dir(DATASET_DIAGNOSTICS_FILE)
