@@ -1,0 +1,17 @@
+{
+  "id": "13574",
+  "slug": "nba-nyk-bos-2024-10-22",
+  "title": "Knicks vs. Celtics",
+  "markets": [
+    {
+      "id": "510342",
+      "conditionId": "0x75951e05b4d48854ca8773adaacc6985bec52c6c6c0f97cd5b48c2449b04d0b0",
+      "question": "Knicks vs. Celtics",
+      "slug": "nba-nyk-bos-2024-10-22",
+      "groupItemTitle": "Knicks vs. Celtics",
+      "sportsMarketType": "moneyline",
+      "outcomes": "[\"Knicks\", \"Celtics\"]",
+      "clobTokenIds": "[\"away-token\", \"home-token\"]"
+    }
+  ]
+}

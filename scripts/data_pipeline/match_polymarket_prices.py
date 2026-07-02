@@ -27,6 +27,7 @@ SRC = ROOT / "src"
 sys.path.insert(0, str(SRC))
 
 from polyedge.backtest import run_simulation
+from polyedge.market_matching import select_home_token
 
 
 SOURCE_DIR = BOOKMAKER_SOURCE_DIR
@@ -96,6 +97,7 @@ REVIEW_COLUMNS = [
     "slug",
     "event_title",
     "home_outcome",
+    "candidate_count",
 ]
 
 
@@ -337,34 +339,6 @@ def find_event_from_slug_candidates(slug_candidates):
     return None, None
 
 
-def extract_home_team_token(event: dict):
-    
-    """
-    Polymarket NBA markets list outcomes as [away, home]
-    The home-team token is therefore token_ids[1]
-
-    """
-    
-    markets = event.get("markets", [])
-    
-    
-    if not isinstance(markets, list) or len(markets) == 0:
-        return None, None, None
-
-    market = markets[0]
-
-    outcomes = parse_list_field(market.get("outcomes"))
-    token_ids = parse_list_field(market.get("clobTokenIds"))
-
-    if len(outcomes) != 2 or len(token_ids) != 2:
-        return None, None, market
-
-    home_outcome = str(outcomes[1])
-    home_token_id = str(token_ids[1])
-
-    return home_token_id, home_outcome, market
-
-
 def fetch_price_before_snapshot(token_id: str, snapshot_dt: datetime):
     """
    Fetch the latest historical token price at or before snapshot_dt.
@@ -487,6 +461,7 @@ def save_review_rows(review_rows):
                 "slug": row.get("slug", ""),
                 "event_title": row.get("event_title", ""),
                 "home_outcome": row.get("home_outcome", ""),
+                "candidate_count": row.get("candidate_count", ""),
             })
 
         writer.writerows(clean_rows)
@@ -585,17 +560,31 @@ def process_source_file(input_path: str, output_path: str, review_rows):
 
         matched_events += 1
 
-        home_token_id, home_outcome, market = extract_home_team_token(event)
+        selection_result = select_home_token(
+            event=event,
+            expected_home_team=home_team,
+            expected_away_team=away_team,
+        )
 
-        if home_token_id is None:
+        if selection_result.selection is None:
             review_rows.append({
                 "market_id": market_id,
-                "reason": "could_not_extract_home_token",
+                "reason": (
+                    selection_result.reason
+                    or "home_token_selection_failed"
+                ),
                 "slug": winning_slug,
                 "event_title": event.get("title", ""),
                 "home_outcome": "",
+                "candidate_count": (
+                    selection_result.candidate_count
+                ),
             })
             continue
+
+        selection = selection_result.selection
+        home_token_id = selection.home_token_id
+        home_outcome = selection.home_outcome
 
         event_end_date_raw = event.get("endDate")
 
