@@ -4,7 +4,7 @@ import os
 import re
 import time
 from collections import defaultdict
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from typing import Optional, Dict
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
@@ -28,6 +28,7 @@ sys.path.insert(0, str(SRC))
 
 from polyedge.backtest import run_simulation
 from polyedge.market_matching import select_home_token
+from polyedge.time_semantics import choose_aligned_snapshot_time
 
 
 SOURCE_DIR = BOOKMAKER_SOURCE_DIR
@@ -39,9 +40,6 @@ CLOB_BASE = "https://clob.polymarket.com"
 # Polymarket exposes historical prices, not historical order books.
 # We treat the historical price as midpoint and synthesize bid/ask.
 SYNTHETIC_TOTAL_SPREAD = 0.02
-
-# Snapshot time before game start/endDate proxy.
-SNAPSHOT_HOURS_BEFORE_GAME = 2
 
 PRICE_LOOKBACK_HOURS = 72
 REQUEST_SLEEP_SECONDS = 0.20
@@ -586,20 +584,30 @@ def process_source_file(input_path: str, output_path: str, review_rows):
         home_token_id = selection.home_token_id
         home_outcome = selection.home_outcome
 
-        event_end_date_raw = event.get("endDate")
+        pregame_row = sorted(
+            pregame_rows,
+            key=lambda row: row["timestamp"],
+        )[0]
 
-        if not event_end_date_raw:
+        snapshot_result = choose_aligned_snapshot_time(
+            bookmaker_timestamp=pregame_row["timestamp"],
+            game_start_time=selection.game_start_time,
+        )
+
+        if snapshot_result.snapshot_time is None:
             review_rows.append({
                 "market_id": market_id,
-                "reason": "event_missing_end_date",
+                "reason": (
+                    snapshot_result.reason
+                    or "snapshot_time_selection_failed"
+                ),
                 "slug": winning_slug,
                 "event_title": event.get("title", ""),
                 "home_outcome": home_outcome,
             })
             continue
 
-        game_time = parse_timestamp(event_end_date_raw)
-        snapshot_dt = game_time - timedelta(hours=SNAPSHOT_HOURS_BEFORE_GAME)
+        snapshot_dt = snapshot_result.snapshot_time
 
         try:
             polymarket_mid = fetch_price_before_snapshot(
@@ -632,8 +640,6 @@ def process_source_file(input_path: str, output_path: str, review_rows):
             polymarket_mid,
             SYNTHETIC_TOTAL_SPREAD,
         )
-
-        pregame_row = sorted(pregame_rows, key=lambda row: row["timestamp"])[0]
 
         output_rows.append({
             "timestamp": naive_utc_iso(snapshot_dt),

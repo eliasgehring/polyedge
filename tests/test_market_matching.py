@@ -31,6 +31,14 @@ def test_selects_home_token_from_real_observed_schema():
     assert result.reason is None
     assert result.candidate_count == 1
     assert result.selection is not None
+    assert (
+        result.selection.game_start_time
+        == "2024-10-22 23:30:00+00"
+    )
+    assert (
+        result.selection.game_start_time
+        == "2024-10-22 23:30:00+00"
+    )
     assert result.selection.home_outcome == "Celtics"
     assert result.selection.away_outcome == "Knicks"
     assert result.selection.home_token_id == "home-token"

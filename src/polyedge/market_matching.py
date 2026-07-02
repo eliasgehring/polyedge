@@ -66,6 +66,7 @@ class HomeTokenSelection:
     condition_id: str
     market_slug: str
     market_question: str
+    game_start_time: str
     home_outcome: str
     away_outcome: str
     home_token_id: str
@@ -217,6 +218,9 @@ def select_home_token(
                 condition_id=str(market.get("conditionId", "")),
                 market_slug=str(market.get("slug", "")),
                 market_question=str(market.get("question", "")),
+                game_start_time=str(
+                    market.get("gameStartTime", "")
+                ),
                 home_outcome=outcomes[home_index],
                 away_outcome=outcomes[away_index],
                 home_token_id=token_ids[home_index],
