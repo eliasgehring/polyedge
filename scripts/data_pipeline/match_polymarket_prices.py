@@ -29,6 +29,7 @@ sys.path.insert(0, str(SRC))
 from polyedge.backtest import run_simulation
 from polyedge.market_matching import select_home_token
 from polyedge.time_semantics import choose_aligned_snapshot_time
+from polyedge.price_history import PriceHistorySelection, select_latest_price_before_snapshot
 
 
 SOURCE_DIR = BOOKMAKER_SOURCE_DIR
@@ -42,6 +43,8 @@ CLOB_BASE = "https://clob.polymarket.com"
 SYNTHETIC_TOTAL_SPREAD = 0.02
 
 PRICE_LOOKBACK_HOURS = 72
+MAX_PRICE_STALENESS_HOURS = 6
+MAX_PRICE_STALENESS_SECONDS = MAX_PRICE_STALENESS_HOURS * 3600
 REQUEST_SLEEP_SECONDS = 0.20
 CHECKPOINT_EVERY = 50
 
@@ -96,6 +99,8 @@ REVIEW_COLUMNS = [
     "event_title",
     "home_outcome",
     "candidate_count",
+    "price_timestamp",
+    "price_age_seconds",
 ]
 
 
@@ -337,11 +342,16 @@ def find_event_from_slug_candidates(slug_candidates):
     return None, None
 
 
-def fetch_price_before_snapshot(token_id: str, snapshot_dt: datetime):
+def fetch_price_before_snapshot(
+    token_id: str,
+    snapshot_dt: datetime,
+) -> PriceHistorySelection:
     """
-   Fetch the latest historical token price at or before snapshot_dt.
-   Use startTs/endTs only; Polymarket does not combine absolute ranges
-   with interval-based queries.
+    Fetch the latest historical token price at or before snapshot_dt.
+
+    Polymarket exposes historical prices, not historical order books.
+    The returned price is usable only if it is recent enough relative
+    to the aligned bookmaker snapshot.
     """
     snapshot_ts = dt_to_unix(snapshot_dt)
     start_ts = snapshot_ts - PRICE_LOOKBACK_HOURS * 3600
@@ -359,32 +369,21 @@ def fetch_price_before_snapshot(token_id: str, snapshot_dt: datetime):
 
     time.sleep(REQUEST_SLEEP_SECONDS)
 
+    if not isinstance(payload, dict):
+        return PriceHistorySelection(
+            price=None,
+            timestamp=None,
+            age_seconds=None,
+            reason="invalid_price_history_payload",
+        )
+
     history = payload.get("history", [])
 
-    if not isinstance(history, list) or len(history) == 0:
-        return None
-
-    best_price = None
-    best_time = None
-
-    for point in history:
-        try:
-            point_time = int(point["t"])
-            point_price = float(point["p"])
-        except Exception:
-            continue
-
-        if not (0.0 <= point_price <= 1.0):
-            continue
-
-        if point_time > snapshot_ts:
-            continue
-
-        if best_time is None or point_time > best_time:
-            best_time = point_time
-            best_price = point_price
-
-    return best_price
+    return select_latest_price_before_snapshot(
+        history=history,
+        snapshot_timestamp=snapshot_ts,
+        max_staleness_seconds=MAX_PRICE_STALENESS_SECONDS,
+    )
 
 
 def load_existing_processed_market_ids(output_path: str):
@@ -460,6 +459,8 @@ def save_review_rows(review_rows):
                 "event_title": row.get("event_title", ""),
                 "home_outcome": row.get("home_outcome", ""),
                 "candidate_count": row.get("candidate_count", ""),
+                "price_timestamp": row.get("price_timestamp", ""),
+                "price_age_seconds": row.get("price_age_seconds", ""),
             })
 
         writer.writerows(clean_rows)
@@ -610,7 +611,7 @@ def process_source_file(input_path: str, output_path: str, review_rows):
         snapshot_dt = snapshot_result.snapshot_time
 
         try:
-            polymarket_mid = fetch_price_before_snapshot(
+            price_result = fetch_price_before_snapshot(
                 token_id=home_token_id,
                 snapshot_dt=snapshot_dt,
             )
@@ -624,15 +625,24 @@ def process_source_file(input_path: str, output_path: str, review_rows):
             })
             continue
 
-        if polymarket_mid is None:
+        if price_result.price is None:
             review_rows.append({
                 "market_id": market_id,
-                "reason": "no_price_history_before_snapshot",
+                "reason": (
+                    price_result.reason
+                    or "price_history_selection_failed"
+                ),
                 "slug": winning_slug,
                 "event_title": event.get("title", ""),
                 "home_outcome": home_outcome,
+                "price_timestamp": price_result.timestamp or "",
+                "price_age_seconds": (
+                    price_result.age_seconds or ""
+                ),
             })
             continue
+
+        polymarket_mid = price_result.price
 
         matched_with_price += 1
 
