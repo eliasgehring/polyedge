@@ -391,15 +391,11 @@ def fetch_price_before_snapshot(
     )
 
 
-def load_existing_processed_market_ids(output_path: str):
-    """
-    Resume support: markets with existing pregame rows are skipped.
-
-    """
+def load_existing_output_pregame_market_ids(output_path: str):
     if not os.path.exists(output_path):
         return set()
 
-    processed = set()
+    market_ids = set()
 
     with open(output_path, mode="r", newline="", encoding="utf-8") as file:
         reader = csv.DictReader(file)
@@ -408,9 +404,22 @@ def load_existing_processed_market_ids(output_path: str):
             if not is_settlement_row(row):
                 market_id = row.get("market_id")
                 if market_id:
-                    processed.add(market_id)
+                    market_ids.add(market_id)
 
-    return processed
+    return market_ids
+
+
+def processed_market_ids_with_manifest(
+    output_pregame_market_ids,
+    manifest_rows,
+):
+    manifest_market_ids = {
+        row.get("source_market_id")
+        for row in manifest_rows
+        if row.get("source_market_id")
+    }
+
+    return output_pregame_market_ids & manifest_market_ids
 
 
 def load_existing_output_rows(output_path: str):
@@ -520,9 +529,15 @@ def process_source_file(input_path: str, output_path: str, review_rows):
     market_ids = list(grouped.keys())
     total_markets = len(market_ids)
 
-    existing_processed = load_existing_processed_market_ids(output_path)
     output_rows = load_existing_output_rows(output_path)
     manifest_rows = load_match_manifest_rows()
+    output_pregame_market_ids = load_existing_output_pregame_market_ids(
+        output_path
+    )
+    existing_processed = processed_market_ids_with_manifest(
+        output_pregame_market_ids=output_pregame_market_ids,
+        manifest_rows=manifest_rows,
+    )
 
     matched_events = 0
     matched_with_price = len(existing_processed)
