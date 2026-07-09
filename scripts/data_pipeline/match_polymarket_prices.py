@@ -15,6 +15,7 @@ from polyedge.paths import (
     BOOKMAKER_SOURCE_DIR,
     HISTORICAL_READY_DIR,
     POLYMARKET_REVIEW_FILE,
+    DIAGNOSTICS_DIR,
     ensure_dir,
     ensure_parent_dir,
 )
@@ -28,6 +29,7 @@ sys.path.insert(0, str(SRC))
 
 from polyedge.backtest import run_simulation
 from polyedge.market_matching import select_home_token
+from polyedge.match_manifest import MATCH_MANIFEST_COLUMNS, build_match_manifest_row
 from polyedge.time_semantics import choose_aligned_snapshot_time
 from polyedge.price_history import PriceHistorySelection, select_latest_price_before_snapshot
 
@@ -35,6 +37,9 @@ from polyedge.price_history import PriceHistorySelection, select_latest_price_be
 SOURCE_DIR = BOOKMAKER_SOURCE_DIR
 OUTPUT_DIR = HISTORICAL_READY_DIR
 REVIEW_FILE = POLYMARKET_REVIEW_FILE
+MATCH_MANIFEST_FILE = (
+    DIAGNOSTICS_DIR / "polymarket_match_manifest.csv"
+)
 GAMMA_BASE = "https://gamma-api.polymarket.com"
 CLOB_BASE = "https://clob.polymarket.com"
 
@@ -466,6 +471,40 @@ def save_review_rows(review_rows):
         writer.writerows(clean_rows)
 
 
+def load_match_manifest_rows():
+    if not MATCH_MANIFEST_FILE.exists():
+        return []
+
+    with MATCH_MANIFEST_FILE.open(
+        mode="r",
+        newline="",
+        encoding="utf-8",
+    ) as file:
+        reader = csv.DictReader(file)
+
+        return [
+            row
+            for row in reader
+            if all(column in row for column in MATCH_MANIFEST_COLUMNS)
+        ]
+
+
+def save_match_manifest_rows(manifest_rows):
+    ensure_parent_dir(MATCH_MANIFEST_FILE)
+
+    with MATCH_MANIFEST_FILE.open(
+        mode="w",
+        newline="",
+        encoding="utf-8",
+    ) as file:
+        writer = csv.DictWriter(
+            file,
+            fieldnames=MATCH_MANIFEST_COLUMNS,
+        )
+        writer.writeheader()
+        writer.writerows(manifest_rows)
+
+
 def process_source_file(input_path: str, output_path: str, review_rows):
     grouped = defaultdict(list)
 
@@ -483,6 +522,7 @@ def process_source_file(input_path: str, output_path: str, review_rows):
 
     existing_processed = load_existing_processed_market_ids(output_path)
     output_rows = load_existing_output_rows(output_path)
+    manifest_rows = load_match_manifest_rows()
 
     matched_events = 0
     matched_with_price = len(existing_processed)
@@ -651,6 +691,22 @@ def process_source_file(input_path: str, output_path: str, review_rows):
             SYNTHETIC_TOTAL_SPREAD,
         )
 
+        manifest_rows.append(
+            build_match_manifest_row(
+                source_market_id=market_id,
+                output_market_id=pregame_row["market_id"],
+                slug=winning_slug,
+                selection=selection,
+                snapshot_timestamp=naive_utc_iso(snapshot_dt),
+                price_result=price_result,
+                polymarket_mid=polymarket_mid,
+                synthetic_total_spread=SYNTHETIC_TOTAL_SPREAD,
+                best_bid=best_bid,
+                best_ask=best_ask,
+                bookmaker_prob=pregame_row["bookmaker_prob"],
+            )
+        )
+
         output_rows.append({
             "timestamp": naive_utc_iso(snapshot_dt),
             "market_id": pregame_row["market_id"],
@@ -675,17 +731,20 @@ def process_source_file(input_path: str, output_path: str, review_rows):
         if idx % CHECKPOINT_EVERY == 0:
             save_output_rows(output_path, output_rows)
             save_review_rows(review_rows)
+            save_match_manifest_rows(manifest_rows)
             print(
                 f"    checkpoint saved at market {idx}: "
                 f"{matched_with_price} matched with price history"
             )
 
     save_output_rows(output_path, output_rows)
+    save_match_manifest_rows(manifest_rows)
 
     print(f"  skipped already completed markets : {skipped_already_done}")
     print(f"  matched Polymarket events         : {matched_events}")
     print(f"  matched events with price history : {matched_with_price}")
     print(f"  wrote {len(output_rows)} rows to {output_path}")
+    print(f"  wrote {len(manifest_rows)} manifest rows to {MATCH_MANIFEST_FILE}")
 
 
 def main():
