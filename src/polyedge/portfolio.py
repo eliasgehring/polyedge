@@ -177,9 +177,51 @@ def compute_portfolio_value(
 def compute_unrealized_pnl(
     portfolio: Portfolio,
     latest_market_state_by_id: dict,
+) -> float:
+    unrealized_pnl = 0.0
+
+    for market_id, market_position in portfolio.positions.items():
+        market = latest_market_state_by_id.get(market_id)
+
+        if market is None:
+            continue
+
+        midpoint = compute_midpoint(
+            market.best_bid,
+            market.best_ask,
+        )
+
+        yes_size = market_position["YES"]["size"]
+        yes_avg_price = market_position["YES"]["avg_price"]
+
+        no_size = market_position["NO"]["size"]
+        no_avg_price = market_position["NO"]["avg_price"]
+
+        yes_unrealized_pnl = yes_size * (
+            midpoint - yes_avg_price
+        )
+        no_unrealized_pnl = no_size * (
+            (1.0 - midpoint) - no_avg_price
+        )
+
+        unrealized_pnl += (
+            yes_unrealized_pnl
+            + no_unrealized_pnl
+        )
+
+    return unrealized_pnl
+
+
+def compute_total_pnl(
+    portfolio: Portfolio,
+    latest_market_state_by_id: dict,
     starting_cash: float,
 ) -> float:
-    total_value = compute_portfolio_value(portfolio, latest_market_state_by_id)
+    total_value = compute_portfolio_value(
+        portfolio,
+        latest_market_state_by_id,
+    )
+
     return total_value - starting_cash
 
 

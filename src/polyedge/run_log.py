@@ -5,6 +5,7 @@ from .pricing import compute_midpoint, compute_spread
 from .portfolio import (
     compute_portfolio_value,
     compute_unrealized_pnl,
+    compute_total_pnl,
     compute_side_unrealized_pnl,
 )
 from .config import STARTING_CASH
@@ -50,6 +51,8 @@ def initialize_csv_log(filepath: str) -> None:
                 "yes_pnl",
                 "no_pnl",
                 "unrealized_pnl",
+                "cumulative_realized_pnl",
+                "total_pnl",
                 "exit_triggered",
                 "exit_reason",
                 "exit_side",
@@ -77,13 +80,30 @@ def log_step_to_csv(
 ) -> None:
     midpoint = compute_midpoint(market.best_bid, market.best_ask)
     spread = compute_spread(market.best_bid, market.best_ask)
-    total_value = compute_portfolio_value(portfolio, latest_market_state_by_id)    
+    total_value = compute_portfolio_value(
+        portfolio,
+        latest_market_state_by_id,
+    )
+
     unrealized_pnl = compute_unrealized_pnl(
-    portfolio,
-    latest_market_state_by_id,
-    STARTING_CASH,)  
-      
-    side_pnl = compute_side_unrealized_pnl(portfolio, market)
+        portfolio,
+        latest_market_state_by_id,
+    )
+
+    total_pnl = compute_total_pnl(
+        portfolio,
+        latest_market_state_by_id,
+        STARTING_CASH,
+    )
+
+    cumulative_realized_pnl = (
+        total_pnl - unrealized_pnl
+    )
+
+    side_pnl = compute_side_unrealized_pnl(
+        portfolio,
+        market,
+    )
     
     yes_size = get_yes_size(portfolio, market.market_id)
     yes_avg_price = get_yes_avg_price(portfolio, market.market_id)
@@ -140,6 +160,8 @@ def log_step_to_csv(
             side_pnl["YES"],
             side_pnl["NO"],
             unrealized_pnl,
+            cumulative_realized_pnl,
+            total_pnl,
             exit_triggered,
             exit_reason,
             exit_side,

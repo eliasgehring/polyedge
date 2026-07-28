@@ -38,10 +38,9 @@ def report_state(
     spread = compute_spread(market.best_bid, market.best_ask)
     total_value = compute_portfolio_value(portfolio, latest_market_state_by_id)
     unrealized_pnl = compute_unrealized_pnl(
-    portfolio,
-    latest_market_state_by_id,
-    STARTING_CASH,
-)
+        portfolio,
+        latest_market_state_by_id,
+    )
 
     side_pnl = compute_side_unrealized_pnl(portfolio, market)
 
