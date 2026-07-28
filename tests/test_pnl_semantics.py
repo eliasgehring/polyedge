@@ -1,6 +1,6 @@
 import pytest
 
-from polyedge.legacy_models import MarketState
+from polyedge.domain import MarketQuote
 from polyedge.portfolio import (
     compute_total_pnl,
     compute_unrealized_pnl,
@@ -49,7 +49,7 @@ def test_open_yes_position_unrealized_pnl():
 
     portfolio.cash = 996.0
 
-    market = MarketState(
+    market = MarketQuote(
         market_id="market_a",
         best_bid=0.49,
         best_ask=0.51,
@@ -83,7 +83,7 @@ def test_total_pnl_equals_realized_plus_unrealized():
     # of previously realized profit.
     portfolio.cash = 1001.0
 
-    market = MarketState(
+    market = MarketQuote(
         market_id="market_a",
         best_bid=0.49,
         best_ask=0.51,

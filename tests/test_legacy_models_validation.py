@@ -1,11 +1,12 @@
 import pytest
 
-from polyedge.legacy_models import Fill, MarketState, Portfolio, Signal
+from polyedge.domain import MarketQuote
+from polyedge.legacy_models import Fill, Portfolio, Signal
 
 
 def test_market_state_rejects_crossed_bid_ask():
     with pytest.raises(ValueError):
-        MarketState(
+        MarketQuote(
             market_id="market_1",
             best_bid=0.60,
             best_ask=0.50,
@@ -14,7 +15,7 @@ def test_market_state_rejects_crossed_bid_ask():
 
 def test_market_state_rejects_invalid_probability():
     with pytest.raises(ValueError):
-        MarketState(
+        MarketQuote(
             market_id="market_1",
             best_bid=-0.01,
             best_ask=0.50,

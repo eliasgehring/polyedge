@@ -1,4 +1,5 @@
-from .legacy_models import Portfolio, MarketState
+from .legacy_models import Portfolio
+from .domain import MarketQuote
 from .pricing import compute_midpoint, compute_spread
 from .portfolio import (
     compute_portfolio_value,
@@ -26,7 +27,7 @@ def report_state(
     reason: str,
     fill,
     portfolio: Portfolio,
-    market: MarketState,
+    market: MarketQuote,
     latest_market_state_by_id,
     exit_triggered: bool = False,
     exit_reason: str = "",

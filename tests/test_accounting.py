@@ -1,4 +1,5 @@
-from polyedge.legacy_models import Portfolio, MarketState, Fill
+from polyedge.legacy_models import Portfolio, Fill
+from polyedge.domain import MarketQuote
 from polyedge.portfolio import (
     create_portfolio,
     apply_fill,
@@ -23,12 +24,12 @@ def test_global_portfolio_value_includes_all_open_markets():
     )
 
     latest_market_state_by_id = {
-        "market_a": MarketState(
+        "market_a": MarketQuote(
             market_id="market_a",
             best_bid=0.49,
             best_ask=0.51,
         ),
-        "market_b": MarketState(
+        "market_b": MarketQuote(
             market_id="market_b",
             best_bid=0.59,
             best_ask=0.61,
@@ -48,7 +49,7 @@ def test_global_portfolio_value_includes_all_open_markets():
 def test_buy_yes_resolves_yes():
     portfolio = create_portfolio(1000.0)
 
-    entry_market = MarketState(
+    entry_market = MarketQuote(
         market_id="market_yes",
         best_bid=0.39,
         best_ask=0.41,
@@ -64,7 +65,7 @@ def test_buy_yes_resolves_yes():
 
     assert portfolio.cash == 996.0
 
-    resolved_market = MarketState(
+    resolved_market = MarketQuote(
         market_id="market_yes",
         best_bid=1.0,
         best_ask=1.0,
@@ -78,7 +79,7 @@ def test_buy_yes_resolves_yes():
 def test_buy_yes_resolves_no():
     portfolio = create_portfolio(1000.0)
 
-    entry_market = MarketState(
+    entry_market = MarketQuote(
         market_id="market_yes",
         best_bid=0.39,
         best_ask=0.41,
@@ -92,7 +93,7 @@ def test_buy_yes_resolves_no():
 
     apply_fill(portfolio, fill, entry_market)
 
-    resolved_market = MarketState(
+    resolved_market = MarketQuote(
         market_id="market_yes",
         best_bid=0.0,
         best_ask=0.0,
@@ -106,7 +107,7 @@ def test_buy_yes_resolves_no():
 def test_buy_no_resolves_no():
     portfolio = create_portfolio(1000.0)
 
-    entry_market = MarketState(
+    entry_market = MarketQuote(
         market_id="market_no",
         best_bid=0.64,
         best_ask=0.66,
@@ -122,7 +123,7 @@ def test_buy_no_resolves_no():
 
     assert portfolio.cash == 996.5
 
-    resolved_market = MarketState(
+    resolved_market = MarketQuote(
         market_id="market_no",
         best_bid=0.0,
         best_ask=0.0,
@@ -136,7 +137,7 @@ def test_buy_no_resolves_no():
 def test_buy_no_resolves_yes():
     portfolio = create_portfolio(1000.0)
 
-    entry_market = MarketState(
+    entry_market = MarketQuote(
         market_id="market_no",
         best_bid=0.64,
         best_ask=0.66,
@@ -150,7 +151,7 @@ def test_buy_no_resolves_yes():
 
     apply_fill(portfolio, fill, entry_market)
 
-    resolved_market = MarketState(
+    resolved_market = MarketQuote(
         market_id="market_no",
         best_bid=1.0,
         best_ask=1.0,

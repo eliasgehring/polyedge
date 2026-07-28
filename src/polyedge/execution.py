@@ -1,4 +1,5 @@
-from .legacy_models import Signal, MarketState, Fill
+from .legacy_models import Signal, Fill
+from .domain import MarketQuote
 from .config import (
     BASE_SLIPPAGE,
     SIZE_IMPACT
@@ -8,7 +9,7 @@ def compute_slippage(size: float) -> float:
     return BASE_SLIPPAGE + SIZE_IMPACT * size
 
 
-def simulate_fill(signal: Signal, market: MarketState, size: float):
+def simulate_fill(signal: Signal, market: MarketQuote, size: float):
     if signal.action == "HOLD":
         return None
 

@@ -1,4 +1,5 @@
-from .legacy_models import Portfolio, Fill, MarketState
+from .legacy_models import Portfolio, Fill
+from .domain import MarketQuote
 from .pricing import compute_midpoint
 
 
@@ -88,7 +89,7 @@ def create_portfolio(starting_cash: float) -> Portfolio:
     )
 
 
-def close_position(portfolio: Portfolio, market: MarketState, side: str) -> float:
+def close_position(portfolio: Portfolio, market: MarketQuote, side: str) -> float:
     if market.market_id not in portfolio.positions:
         return 0.0
 
@@ -121,7 +122,7 @@ def close_position(portfolio: Portfolio, market: MarketState, side: str) -> floa
     return realized_pnl
 
 
-def apply_fill(portfolio: Portfolio, fill: Fill, market: MarketState) -> None:
+def apply_fill(portfolio: Portfolio, fill: Fill, market: MarketQuote) -> None:
     market_positions = ensure_market_position(portfolio, fill.market_id)
 
     if fill.side == "BUY_YES":
@@ -225,7 +226,7 @@ def compute_total_pnl(
     return total_value - starting_cash
 
 
-def compute_side_unrealized_pnl(portfolio: Portfolio, market: MarketState) -> dict:
+def compute_side_unrealized_pnl(portfolio: Portfolio, market: MarketQuote) -> dict:
     midpoint = compute_midpoint(market.best_bid, market.best_ask)
 
     positions_in_market = get_market_position(portfolio, market.market_id)

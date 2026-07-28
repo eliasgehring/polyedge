@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from enum import Enum
+from math import isfinite
 from typing import Dict, Optional, Tuple
 
 
@@ -20,6 +21,46 @@ class ResolvedOutcome(str, Enum):
 
 class ExecutionMode(str, Enum):
     SYNTHETIC_BID_ASK = "SYNTHETIC_BID_ASK"
+
+
+@dataclass(frozen=True)
+class MarketQuote:
+    """
+    Executable YES-side market quote.
+
+    best_bid and best_ask are prices for the YES contract.
+    The executable NO ask is 1 - best_bid.
+    """
+
+    market_id: str
+    best_bid: float
+    best_ask: float
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.market_id, str) or not self.market_id:
+            raise ValueError("market_id must be a non-empty string")
+
+        for name, value in (
+            ("best_bid", self.best_bid),
+            ("best_ask", self.best_ask),
+        ):
+            if isinstance(value, bool) or not isinstance(value, (int, float)):
+                raise TypeError(f"{name} must be a finite number")
+
+            if not isfinite(value):
+                raise ValueError(f"{name} must be finite")
+
+            if not 0.0 <= value <= 1.0:
+                raise ValueError(
+                    f"{name} must be in [0, 1], got {value}"
+                )
+
+        if self.best_bid > self.best_ask:
+            raise ValueError(
+                "best_bid must be <= best_ask, got "
+                f"best_bid={self.best_bid}, "
+                f"best_ask={self.best_ask}"
+            )
 
 
 @dataclass(frozen=True)

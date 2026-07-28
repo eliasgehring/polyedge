@@ -1,12 +1,13 @@
 import pytest
 
-from polyedge.legacy_models import MarketState, Signal
+from polyedge.legacy_models import Signal
+from polyedge.domain import MarketQuote
 from polyedge.execution import simulate_fill
 from polyedge.config import BASE_SLIPPAGE, SIZE_IMPACT
 
 
 def test_buy_yes_executes_at_yes_ask_plus_slippage():
-    market = MarketState(
+    market = MarketQuote(
         market_id="market_a",
         best_bid=0.49,
         best_ask=0.51,
@@ -33,7 +34,7 @@ def test_buy_yes_executes_at_yes_ask_plus_slippage():
 
 
 def test_buy_no_executes_at_no_ask_plus_slippage():
-    market = MarketState(
+    market = MarketQuote(
         market_id="market_a",
         best_bid=0.49,
         best_ask=0.51,
@@ -60,7 +61,7 @@ def test_buy_no_executes_at_no_ask_plus_slippage():
 
 
 def test_hold_signal_does_not_execute():
-    market = MarketState(
+    market = MarketQuote(
         market_id="market_a",
         best_bid=0.49,
         best_ask=0.51,

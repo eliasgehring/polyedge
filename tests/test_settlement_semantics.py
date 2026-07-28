@@ -1,4 +1,5 @@
-from polyedge.legacy_models import Fill, MarketState
+from polyedge.legacy_models import Fill
+from polyedge.domain import MarketQuote
 from polyedge.portfolio import apply_fill, create_portfolio
 from polyedge.settlement import check_exit_conditions
 
@@ -6,7 +7,7 @@ from polyedge.settlement import check_exit_conditions
 def test_buy_no_closed_when_yes_resolves_reports_event_outcome_yes_true():
     portfolio = create_portfolio(1000.0)
 
-    entry_market = MarketState(
+    entry_market = MarketQuote(
         market_id="market_a",
         best_bid=0.64,
         best_ask=0.66,
@@ -23,7 +24,7 @@ def test_buy_no_closed_when_yes_resolves_reports_event_outcome_yes_true():
         entry_market,
     )
 
-    resolved_market = MarketState(
+    resolved_market = MarketQuote(
         market_id="market_a",
         best_bid=1.0,
         best_ask=1.0,
@@ -43,7 +44,7 @@ def test_buy_no_closed_when_yes_resolves_reports_event_outcome_yes_true():
 def test_buy_yes_closed_when_yes_false_reports_event_outcome_yes_false():
     portfolio = create_portfolio(1000.0)
 
-    entry_market = MarketState(
+    entry_market = MarketQuote(
         market_id="market_a",
         best_bid=0.39,
         best_ask=0.41,
@@ -60,7 +61,7 @@ def test_buy_yes_closed_when_yes_false_reports_event_outcome_yes_false():
         entry_market,
     )
 
-    resolved_market = MarketState(
+    resolved_market = MarketQuote(
         market_id="market_a",
         best_bid=0.0,
         best_ask=0.0,

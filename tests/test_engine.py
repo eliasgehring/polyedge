@@ -1,4 +1,5 @@
-from polyedge.legacy_models import Portfolio, MarketState
+from polyedge.legacy_models import Portfolio
+from polyedge.domain import MarketQuote
 from polyedge.portfolio import compute_portfolio_value
 
 
@@ -19,12 +20,12 @@ def test_latest_market_state_book_keeps_stale_market_values():
 
     latest_market_state_by_id = {}
 
-    market_a_initial = MarketState(
+    market_a_initial = MarketQuote(
         market_id="market_a",
         best_bid=0.49,
         best_ask=0.51,
     )
-    market_b_initial = MarketState(
+    market_b_initial = MarketQuote(
         market_id="market_b",
         best_bid=0.59,
         best_ask=0.61,
@@ -40,7 +41,7 @@ def test_latest_market_state_book_keeps_stale_market_values():
 
     assert initial_value == 1002.0
 
-    market_a_updated = MarketState(
+    market_a_updated = MarketQuote(
         market_id="market_a",
         best_bid=0.69,
         best_ask=0.71,

@@ -8,12 +8,12 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
 sys.path.insert(0, str(SRC))
 
-from polyedge.legacy_models import MarketState
+from polyedge.domain import MarketQuote
 from polyedge.signals import generate_signal
 
 
 def test_positive_edge_buys_yes():
-    market = MarketState(
+    market = MarketQuote(
         market_id="market_a",
         best_bid=0.49,
         best_ask=0.51,
@@ -30,7 +30,7 @@ def test_positive_edge_buys_yes():
 
 
 def test_negative_edge_buys_no():
-    market = MarketState(
+    market = MarketQuote(
         market_id="market_a",
         best_bid=0.49,
         best_ask=0.51,
@@ -47,7 +47,7 @@ def test_negative_edge_buys_no():
 
 
 def test_hold_inside_threshold():
-    market = MarketState(
+    market = MarketQuote(
         market_id="market_a",
         best_bid=0.49,
         best_ask=0.51,
@@ -63,7 +63,7 @@ def test_hold_inside_threshold():
 
 
 def test_hold_when_market_probability_outside_allowed_band():
-    market = MarketState(
+    market = MarketQuote(
         market_id="market_a",
         best_bid=0.89,
         best_ask=0.91,

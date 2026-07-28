@@ -35,24 +35,6 @@ def _validate_positive_number(value: float, name: str) -> None:
 
 
 @dataclass
-class MarketState:
-    market_id: str
-    best_bid: float
-    best_ask: float
-
-    def __post_init__(self) -> None:
-        _validate_non_empty_string(self.market_id, "market_id")
-        _validate_probability(self.best_bid, "best_bid")
-        _validate_probability(self.best_ask, "best_ask")
-
-        if self.best_bid > self.best_ask:
-            raise ValueError(
-                f"best_bid must be <= best_ask, got "
-                f"best_bid={self.best_bid}, best_ask={self.best_ask}"
-            )
-
-
-@dataclass
 class Signal:
     market_id: str
     bookmaker_prob: float

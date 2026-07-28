@@ -1,7 +1,7 @@
 import csv
 from datetime import datetime
 
-from .legacy_models import MarketState
+from .domain import MarketQuote
 
 
 def parse_timestamp(timestamp_str: str) -> datetime:
@@ -17,7 +17,7 @@ def load_historical_data(filepath: str):
         for row in reader:
             timestamp = row["timestamp"].strip()
 
-            market = MarketState(
+            market = MarketQuote(
                 market_id=row["market_id"].strip(),
                 best_bid=float(row["best_bid"]),
                 best_ask=float(row["best_ask"]),
