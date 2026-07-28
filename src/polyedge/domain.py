@@ -108,6 +108,33 @@ class Fill:
     price: float
     size: float
 
+    def __post_init__(self) -> None:
+        if not isinstance(self.market_id, str) or not self.market_id:
+            raise ValueError("market_id must be a non-empty string")
+
+        if not isinstance(self.side, Side):
+            raise TypeError("side must be a Side")
+
+        for name, value in (
+            ("price", self.price),
+            ("size", self.size),
+        ):
+            if isinstance(value, bool) or not isinstance(value, (int, float)):
+                raise TypeError(f"{name} must be a finite number")
+
+            if not isfinite(value):
+                raise ValueError(f"{name} must be finite")
+
+        if not 0.0 <= self.price <= 1.0:
+            raise ValueError(
+                f"price must be in [0, 1], got {self.price}"
+            )
+
+        if self.size <= 0.0:
+            raise ValueError(
+                f"size must be positive, got {self.size}"
+            )
+
 
 @dataclass(frozen=True)
 class Position:

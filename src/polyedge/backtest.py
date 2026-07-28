@@ -1,6 +1,6 @@
 import os
 
-from .domain import BacktestResult
+from .domain import BacktestResult, Side
 
 from .config import (
     STARTING_CASH,
@@ -204,9 +204,9 @@ def run_simulation(
 
                         total_trades += 1
 
-                        if fill.side == "BUY_YES":
+                        if fill.side is Side.BUY_YES:
                             buy_yes_count += 1
-                        elif fill.side == "BUY_NO":
+                        elif fill.side is Side.BUY_NO:
                             buy_no_count += 1
                 else:
                     if VERBOSE:

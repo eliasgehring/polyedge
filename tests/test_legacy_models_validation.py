@@ -1,7 +1,7 @@
 import pytest
 
-from polyedge.domain import MarketQuote
-from polyedge.legacy_models import Fill, Portfolio, Signal
+from polyedge.domain import Fill, MarketQuote, Side
+from polyedge.legacy_models import Portfolio, Signal
 
 
 def test_market_state_rejects_crossed_bid_ask():
@@ -47,7 +47,7 @@ def test_signal_allows_signed_edge_for_buy_no_compatibility():
 
 
 def test_fill_rejects_unknown_side():
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         Fill(
             market_id="market_1",
             side="YES",
@@ -60,7 +60,7 @@ def test_fill_rejects_non_positive_size():
     with pytest.raises(ValueError):
         Fill(
             market_id="market_1",
-            side="BUY_YES",
+            side=Side.BUY_YES,
             price=0.50,
             size=0.0,
         )

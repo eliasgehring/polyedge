@@ -56,25 +56,6 @@ class Signal:
 
 
 @dataclass
-class Fill:
-    market_id: str
-    side: str
-    price: float
-    size: float
-
-    def __post_init__(self) -> None:
-        _validate_non_empty_string(self.market_id, "market_id")
-
-        if self.side not in VALID_FILL_SIDES:
-            raise ValueError(
-                f"side must be one of {sorted(VALID_FILL_SIDES)}, got {self.side}"
-            )
-
-        _validate_probability(self.price, "price")
-        _validate_positive_number(self.size, "size")
-
-
-@dataclass
 class Portfolio:
     cash: float
     positions: dict

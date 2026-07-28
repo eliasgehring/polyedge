@@ -1,5 +1,5 @@
-from .legacy_models import Signal, Fill
-from .domain import MarketQuote
+from .legacy_models import Signal
+from .domain import Fill, MarketQuote, Side
 from .config import (
     BASE_SLIPPAGE,
     SIZE_IMPACT
@@ -21,7 +21,7 @@ def simulate_fill(signal: Signal, market: MarketQuote, size: float):
 
         return Fill(
             market_id=market.market_id,
-            side="BUY_YES",
+            side=Side.BUY_YES,
             price=price,
             size=size
         )
@@ -32,7 +32,7 @@ def simulate_fill(signal: Signal, market: MarketQuote, size: float):
 
         return Fill(
             market_id=market.market_id,
-            side="BUY_NO",
+            side=Side.BUY_NO,
             price=price,
             size=size
         )

@@ -1,5 +1,5 @@
-from polyedge.legacy_models import Portfolio, Fill
-from polyedge.domain import MarketQuote
+from polyedge.legacy_models import Portfolio
+from polyedge.domain import Fill, MarketQuote, Side
 from polyedge.portfolio import (
     create_portfolio,
     apply_fill,
@@ -56,7 +56,7 @@ def test_buy_yes_resolves_yes():
     )
     fill = Fill(
         market_id="market_yes",
-        side="BUY_YES",
+        side=Side.BUY_YES,
         price=0.40,
         size=10.0,
     )
@@ -86,7 +86,7 @@ def test_buy_yes_resolves_no():
     )
     fill = Fill(
         market_id="market_yes",
-        side="BUY_YES",
+        side=Side.BUY_YES,
         price=0.40,
         size=10.0,
     )
@@ -114,7 +114,7 @@ def test_buy_no_resolves_no():
     )
     fill = Fill(
         market_id="market_no",
-        side="BUY_NO",
+        side=Side.BUY_NO,
         price=0.35,
         size=10.0,
     )
@@ -144,7 +144,7 @@ def test_buy_no_resolves_yes():
     )
     fill = Fill(
         market_id="market_no",
-        side="BUY_NO",
+        side=Side.BUY_NO,
         price=0.35,
         size=10.0,
     )

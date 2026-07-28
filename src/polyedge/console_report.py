@@ -90,7 +90,7 @@ def report_state(
     if fill is None:
         print("Fill           : None")
     else:
-        print(f"Fill Side      : {fill.side}")
+        print(f"Fill Side      : {fill.side.value}")
         print(f"Fill Price     : {fill.price:.3f}")
         print(f"Fill Size      : {fill.size:.3f}")
 

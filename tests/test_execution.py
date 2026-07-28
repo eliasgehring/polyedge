@@ -1,7 +1,7 @@
 import pytest
 
 from polyedge.legacy_models import Signal
-from polyedge.domain import MarketQuote
+from polyedge.domain import MarketQuote, Side
 from polyedge.execution import simulate_fill
 from polyedge.config import BASE_SLIPPAGE, SIZE_IMPACT
 
@@ -28,7 +28,7 @@ def test_buy_yes_executes_at_yes_ask_plus_slippage():
     expected_price = market.best_ask + expected_slippage
 
     assert fill is not None
-    assert fill.side == "BUY_YES"
+    assert fill.side is Side.BUY_YES
     assert fill.price == pytest.approx(expected_price)
     assert fill.size == size
 
@@ -55,7 +55,7 @@ def test_buy_no_executes_at_no_ask_plus_slippage():
     expected_price = (1.0 - market.best_bid) + expected_slippage
 
     assert fill is not None
-    assert fill.side == "BUY_NO"
+    assert fill.side is Side.BUY_NO
     assert fill.price == pytest.approx(expected_price)
     assert fill.size == size
 

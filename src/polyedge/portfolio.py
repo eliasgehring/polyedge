@@ -1,5 +1,5 @@
-from .legacy_models import Portfolio, Fill
-from .domain import MarketQuote
+from .legacy_models import Portfolio
+from .domain import Fill, MarketQuote, Side
 from .pricing import compute_midpoint
 
 
@@ -125,7 +125,7 @@ def close_position(portfolio: Portfolio, market: MarketQuote, side: str) -> floa
 def apply_fill(portfolio: Portfolio, fill: Fill, market: MarketQuote) -> None:
     market_positions = ensure_market_position(portfolio, fill.market_id)
 
-    if fill.side == "BUY_YES":
+    if fill.side is Side.BUY_YES:
         if market_positions["YES"]["size"] > 0:
             raise ValueError(f"Already holding YES in {fill.market_id}")
 
@@ -136,7 +136,7 @@ def apply_fill(portfolio: Portfolio, fill: Fill, market: MarketQuote) -> None:
         set_yes_position(portfolio, fill.market_id, fill.size, fill.price)
         return
 
-    if fill.side == "BUY_NO":
+    if fill.side is Side.BUY_NO:
         if market_positions["NO"]["size"] > 0:
             raise ValueError(f"Already holding NO in {fill.market_id}")
 

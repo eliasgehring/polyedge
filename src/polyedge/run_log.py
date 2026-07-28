@@ -115,7 +115,7 @@ def log_step_to_csv(
     fill_size = ""
 
     if fill is not None:
-        fill_side = fill.side
+        fill_side = fill.side.value
         fill_price = fill.price
         fill_size = fill.size
 

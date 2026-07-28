@@ -1,5 +1,4 @@
-from polyedge.legacy_models import Fill
-from polyedge.domain import MarketQuote
+from polyedge.domain import Fill, MarketQuote, Side
 from polyedge.portfolio import apply_fill, create_portfolio
 from polyedge.settlement import check_exit_conditions
 
@@ -17,7 +16,7 @@ def test_buy_no_closed_when_yes_resolves_reports_event_outcome_yes_true():
         portfolio,
         Fill(
             market_id="market_a",
-            side="BUY_NO",
+            side=Side.BUY_NO,
             price=0.35,
             size=10.0,
         ),
@@ -54,7 +53,7 @@ def test_buy_yes_closed_when_yes_false_reports_event_outcome_yes_false():
         portfolio,
         Fill(
             market_id="market_a",
-            side="BUY_YES",
+            side=Side.BUY_YES,
             price=0.40,
             size=10.0,
         ),
