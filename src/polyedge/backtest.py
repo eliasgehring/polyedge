@@ -16,7 +16,10 @@ from .paths import (
     RESULT_LOGS_DIR,
     RUN_METADATA_FILE,
 )
-from .data_loading import load_historical_data
+from .data_loading import (
+    filter_rows_by_pregame_date,
+    historical_data_from_rows,
+)
 from .portfolio import create_portfolio, apply_fill, compute_portfolio_value
 from .signals import generate_signal
 from .risk import get_trade_decision
@@ -72,6 +75,8 @@ def run_simulation(
     threshold=None,
     edge_size_multiplier=None,
     historical_filepath=None,
+    start_date=None,
+    end_date=None,
     write_logs=True,
     print_output=True,
 ):
@@ -93,17 +98,32 @@ def run_simulation(
     if historical_filepath is None:
         historical_filepath = HISTORICAL_DATA_FILE
 
-    diagnostic_rows = load_rows(historical_filepath)
+    source_rows = load_rows(historical_filepath)
+
+    diagnostic_rows = filter_rows_by_pregame_date(
+        source_rows,
+        start_date=start_date,
+        end_date=end_date,
+    )
+
+    if not diagnostic_rows:
+        raise ValueError(
+            "Date window selected zero markets."
+        )
+
     diagnostics = build_diagnostics(diagnostic_rows)
-    
+
     if diagnostics["hard_fail"]:
         raise ValueError(
-        "Refusing to run backtest because dataset diagnostics failed."
-    )
+            "Refusing to run backtest because filtered dataset "
+            "diagnostics failed."
+        )
 
     dataset_hash = file_sha256(historical_filepath)
 
-    historical_data = load_historical_data(historical_filepath)
+    historical_data = historical_data_from_rows(
+        diagnostic_rows
+    )
     if print_output:
         print_data_load_summary(historical_filepath, historical_data)
 
@@ -293,6 +313,8 @@ def run_simulation(
                 "dataset_pregame_rows": diagnostics["pregame_rows"],
                 "dataset_settlement_rows": diagnostics["settlement_rows"],
                 "dataset_hard_fail": diagnostics["hard_fail"],
+                "start_date": start_date,
+                "end_date": end_date,
             },
         )
 
