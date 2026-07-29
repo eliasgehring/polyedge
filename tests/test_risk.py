@@ -1,4 +1,5 @@
-from polyedge.legacy_models import Portfolio, Signal
+from polyedge.domain import Side, Signal
+from polyedge.legacy_models import Portfolio
 from polyedge.risk import get_trade_decision
 
 
@@ -15,10 +16,12 @@ def test_rejects_trade_when_market_already_has_open_position():
 
     signal = Signal(
         market_id="market_a",
-        bookmaker_prob=0.40,
-        polymarket_prob=0.50,
-        edge=-0.10,
-        action="BUY_NO",
+        side=Side.BUY_NO,
+        model_prob_yes=0.40,
+        market_prob_yes=0.50,
+        edge_yes=-0.10,
+        edge_no=0.10,
+        chosen_edge=0.10,
     )
 
     approved, reason = get_trade_decision(
@@ -32,14 +35,19 @@ def test_rejects_trade_when_market_already_has_open_position():
 
 
 def test_rejects_hold_signal():
-    portfolio = Portfolio(cash=1000.0, positions={})
+    portfolio = Portfolio(
+        cash=1000.0,
+        positions={},
+    )
 
     signal = Signal(
         market_id="market_a",
-        bookmaker_prob=0.50,
-        polymarket_prob=0.50,
-        edge=0.0,
-        action="HOLD",
+        side=None,
+        model_prob_yes=0.50,
+        market_prob_yes=0.50,
+        edge_yes=0.00,
+        edge_no=0.00,
+        chosen_edge=0.00,
     )
 
     approved, reason = get_trade_decision(
@@ -53,14 +61,19 @@ def test_rejects_hold_signal():
 
 
 def test_approves_trade_when_market_has_no_open_position():
-    portfolio = Portfolio(cash=1000.0, positions={})
+    portfolio = Portfolio(
+        cash=1000.0,
+        positions={},
+    )
 
     signal = Signal(
         market_id="market_a",
-        bookmaker_prob=0.60,
-        polymarket_prob=0.50,
-        edge=0.10,
-        action="BUY_YES",
+        side=Side.BUY_YES,
+        model_prob_yes=0.60,
+        market_prob_yes=0.50,
+        edge_yes=0.10,
+        edge_no=-0.10,
+        chosen_edge=0.10,
     )
 
     approved, reason = get_trade_decision(

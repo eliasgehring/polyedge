@@ -90,6 +90,7 @@ class Signal:
     no_ask = 1 - yes_bid
 
     side is None when no trade should be made.
+    chosen_edge is always a non-negative executable edge magnitude.
     """
 
     market_id: str
@@ -99,6 +100,72 @@ class Signal:
     edge_yes: float
     edge_no: float
     chosen_edge: float
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.market_id, str) or not self.market_id:
+            raise ValueError("market_id must be a non-empty string")
+
+        if self.side is not None and not isinstance(self.side, Side):
+            raise TypeError("side must be a Side or None")
+
+        for name, value in (
+            ("model_prob_yes", self.model_prob_yes),
+            ("market_prob_yes", self.market_prob_yes),
+            ("edge_yes", self.edge_yes),
+            ("edge_no", self.edge_no),
+            ("chosen_edge", self.chosen_edge),
+        ):
+            if isinstance(value, bool) or not isinstance(value, (int, float)):
+                raise TypeError(f"{name} must be a finite number")
+
+            if not isfinite(value):
+                raise ValueError(f"{name} must be finite")
+
+        for name, value in (
+            ("model_prob_yes", self.model_prob_yes),
+            ("market_prob_yes", self.market_prob_yes),
+        ):
+            if not 0.0 <= value <= 1.0:
+                raise ValueError(
+                    f"{name} must be in [0, 1], got {value}"
+                )
+
+        if self.chosen_edge < 0.0:
+            raise ValueError("chosen_edge must be non-negative")
+
+        if self.side is None and self.chosen_edge != 0.0:
+            raise ValueError(
+                "HOLD signal must have chosen_edge equal to zero"
+            )
+
+        if self.side is Side.BUY_YES:
+            if self.chosen_edge != self.edge_yes:
+                raise ValueError(
+                    "BUY_YES chosen_edge must equal edge_yes"
+                )
+
+        if self.side is Side.BUY_NO:
+            if self.chosen_edge != self.edge_no:
+                raise ValueError(
+                    "BUY_NO chosen_edge must equal edge_no"
+                )
+
+    @property
+    def action(self) -> str:
+        if self.side is None:
+            return "HOLD"
+
+        return self.side.value
+
+    @property
+    def signed_edge(self) -> float:
+        if self.side is Side.BUY_YES:
+            return self.chosen_edge
+
+        if self.side is Side.BUY_NO:
+            return -self.chosen_edge
+
+        return 0.0
 
 
 @dataclass(frozen=True)

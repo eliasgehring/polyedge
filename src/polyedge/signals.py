@@ -1,10 +1,11 @@
-from .legacy_models import Signal
-from .pricing import compute_midpoint
-from .config import (
-    MIN_MARKET_PROB,
-    MAX_MARKET_PROB,
+from .config import MAX_MARKET_PROB, MIN_MARKET_PROB
+from .domain import (
+    MarketQuote,
+    MarketSnapshot,
+    RowType,
+    Signal,
 )
-from .domain import MarketQuote, MarketSnapshot, RowType, Side
+from .pricing import compute_midpoint
 from .probability import generate_signal as generate_probability_signal
 
 
@@ -14,37 +15,30 @@ def generate_signal(
     threshold: float,
 ) -> Signal:
     """
-    Legacy-compatible signal wrapper.
+    Generate an executable probability signal.
 
-    The old engine expects models.Signal with:
-    - bookmaker_prob
-    - polymarket_prob
-    - edge
-    - action as a string
-
-    The new semantic core computes executable edge explicitly:
-    - edge_yes = model_prob_yes - yes_ask
-    - edge_no = (1 - model_prob_yes) - no_ask
-    - no_ask = 1 - yes_bid
-
-    For backward compatibility, this wrapper returns:
-    - positive edge for BUY_YES
-    - negative edge for BUY_NO
-    - zero edge for HOLD
-
-    This lets the old backtest keep running while the new probability
-    semantics become the source of truth.
+    YES and NO edges are calculated against their respective asks.
+    A HOLD signal has side=None and chosen_edge=0.
     """
 
-    polymarket_prob = compute_midpoint(market.best_bid, market.best_ask)
+    market_prob_yes = compute_midpoint(
+        market.best_bid,
+        market.best_ask,
+    )
 
-    if not (MIN_MARKET_PROB < polymarket_prob < MAX_MARKET_PROB):
+    if not (
+        MIN_MARKET_PROB
+        < market_prob_yes
+        < MAX_MARKET_PROB
+    ):
         return Signal(
             market_id=market.market_id,
-            bookmaker_prob=bookmaker_prob,
-            polymarket_prob=polymarket_prob,
-            edge=0.0,
-            action="HOLD",
+            side=None,
+            model_prob_yes=bookmaker_prob,
+            market_prob_yes=market_prob_yes,
+            edge_yes=0.0,
+            edge_no=0.0,
+            chosen_edge=0.0,
         )
 
     snapshot = MarketSnapshot(
@@ -56,33 +50,7 @@ def generate_signal(
         row_type=RowType.PREGAME,
     )
 
-    semantic_signal = generate_probability_signal(
+    return generate_probability_signal(
         snapshot=snapshot,
         threshold=threshold,
-    )
-
-    if semantic_signal.side == Side.BUY_YES:
-        return Signal(
-            market_id=market.market_id,
-            bookmaker_prob=bookmaker_prob,
-            polymarket_prob=polymarket_prob,
-            edge=semantic_signal.edge_yes,
-            action="BUY_YES",
-        )
-
-    if semantic_signal.side == Side.BUY_NO:
-        return Signal(
-            market_id=market.market_id,
-            bookmaker_prob=bookmaker_prob,
-            polymarket_prob=polymarket_prob,
-            edge=-semantic_signal.edge_no,
-            action="BUY_NO",
-        )
-
-    return Signal(
-        market_id=market.market_id,
-        bookmaker_prob=bookmaker_prob,
-        polymarket_prob=polymarket_prob,
-        edge=0.0,
-        action="HOLD",
     )

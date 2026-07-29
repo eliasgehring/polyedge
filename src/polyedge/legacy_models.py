@@ -35,27 +35,6 @@ def _validate_positive_number(value: float, name: str) -> None:
 
 
 @dataclass
-class Signal:
-    market_id: str
-    bookmaker_prob: float
-    polymarket_prob: float
-    edge: float
-    action: str
-
-    def __post_init__(self) -> None:
-        _validate_non_empty_string(self.market_id, "market_id")
-        _validate_probability(self.bookmaker_prob, "bookmaker_prob")
-        _validate_probability(self.polymarket_prob, "polymarket_prob")
-        _validate_finite_number(self.edge, "edge")
-
-        if self.action not in VALID_SIGNAL_ACTIONS:
-            raise ValueError(
-                f"action must be one of {sorted(VALID_SIGNAL_ACTIONS)}, "
-                f"got {self.action}"
-            )
-
-
-@dataclass
 class Portfolio:
     cash: float
     positions: dict

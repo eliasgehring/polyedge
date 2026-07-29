@@ -128,9 +128,9 @@ def log_step_to_csv(
     if signal is not None:
         market_id = signal.market_id
         action = signal.action
-        bookmaker_prob = signal.bookmaker_prob
-        polymarket_prob = signal.polymarket_prob
-        edge = signal.edge
+        bookmaker_prob = signal.model_prob_yes
+        polymarket_prob = signal.market_prob_yes
+        edge = signal.signed_edge
 
     with open(filepath, mode="a", newline="") as file:
         writer = csv.writer(file)

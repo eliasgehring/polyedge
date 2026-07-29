@@ -61,9 +61,9 @@ def report_state(
     else:
         market_id = signal.market_id
         action = signal.action
-        bookmaker_prob = signal.bookmaker_prob
-        polymarket_prob = signal.polymarket_prob
-        edge = signal.edge
+        bookmaker_prob = signal.model_prob_yes
+        polymarket_prob = signal.market_prob_yes
+        edge = signal.signed_edge
         edge_strength = abs(edge)
 
     print("\n" + "=" * 48)

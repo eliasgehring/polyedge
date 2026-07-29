@@ -1,4 +1,5 @@
-from .legacy_models import Signal, Portfolio
+from .legacy_models import Portfolio
+from .domain import Signal
 from .portfolio import has_open_position
 
 
@@ -10,7 +11,7 @@ def get_trade_decision(signal: Signal, portfolio: Portfolio, max_position_size: 
     - No adding after entry
     """
 
-    if signal.action == "HOLD":
+    if signal.side is None:
         return False, "HOLD signal"
     
     if has_open_position(portfolio, signal.market_id):

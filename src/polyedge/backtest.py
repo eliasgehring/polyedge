@@ -180,7 +180,7 @@ def run_simulation(
                     f"REASON: {reason}"
                 )
 
-            if signal.action == "HOLD":
+            if signal.side is None:
                 hold_count += 1
             elif not approved:
                 risk_rejection_count += 1

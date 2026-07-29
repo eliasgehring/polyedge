@@ -1,5 +1,4 @@
-from .legacy_models import Signal
-from .domain import Fill, MarketQuote, Side
+from .domain import Fill, MarketQuote, Side, Signal
 from .config import (
     BASE_SLIPPAGE,
     SIZE_IMPACT
@@ -10,12 +9,12 @@ def compute_slippage(size: float) -> float:
 
 
 def simulate_fill(signal: Signal, market: MarketQuote, size: float):
-    if signal.action == "HOLD":
+    if signal.side is None:
         return None
 
     slippage = compute_slippage(size)
 
-    if signal.action == "BUY_YES":
+    if signal.side is Side.BUY_YES:
         raw_price = market.best_ask
         price = min(1.0, raw_price + slippage)
 
@@ -26,7 +25,7 @@ def simulate_fill(signal: Signal, market: MarketQuote, size: float):
             size=size
         )
 
-    if signal.action == "BUY_NO":
+    if signal.side is Side.BUY_NO:
         raw_price = 1.0 - market.best_bid
         price = min(1.0, raw_price + slippage)
 

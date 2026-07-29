@@ -1,7 +1,7 @@
 import pytest
 
-from polyedge.domain import Fill, MarketQuote, Side
-from polyedge.legacy_models import Portfolio, Signal
+from polyedge.domain import Fill, MarketQuote, Side, Signal
+from polyedge.legacy_models import Portfolio
 
 
 def test_market_state_rejects_crossed_bid_ask():
@@ -22,27 +22,31 @@ def test_market_state_rejects_invalid_probability():
         )
 
 
-def test_signal_rejects_unknown_action():
-    with pytest.raises(ValueError):
+def test_signal_rejects_unknown_side_type():
+    with pytest.raises(TypeError):
         Signal(
             market_id="market_1",
-            bookmaker_prob=0.60,
-            polymarket_prob=0.50,
-            edge=0.10,
-            action="BUY",
+            side="BUY",
+            model_prob_yes=0.60,
+            market_prob_yes=0.50,
+            edge_yes=0.10,
+            edge_no=-0.10,
+            chosen_edge=0.10,
         )
 
 
-def test_signal_allows_signed_edge_for_buy_no_compatibility():
+def test_signal_exposes_signed_edge_for_buy_no_logs():
     signal = Signal(
         market_id="market_1",
-        bookmaker_prob=0.40,
-        polymarket_prob=0.50,
-        edge=-0.09,
-        action="BUY_NO",
+        side=Side.BUY_NO,
+        model_prob_yes=0.40,
+        market_prob_yes=0.50,
+        edge_yes=-0.09,
+        edge_no=0.09,
+        chosen_edge=0.09,
     )
 
-    assert signal.edge == pytest.approx(-0.09)
+    assert signal.signed_edge == pytest.approx(-0.09)
     assert signal.action == "BUY_NO"
 
 
