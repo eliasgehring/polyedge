@@ -1,5 +1,5 @@
 from polyedge.domain import Side, Signal
-from polyedge.legacy_models import Portfolio
+from polyedge.domain import Portfolio
 from polyedge.risk import get_trade_decision
 
 

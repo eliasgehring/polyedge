@@ -1,4 +1,4 @@
-from polyedge.legacy_models import Portfolio
+from polyedge.domain import Portfolio
 from polyedge.domain import MarketQuote
 from polyedge.portfolio import compute_portfolio_value
 

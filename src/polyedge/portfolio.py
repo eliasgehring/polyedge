@@ -1,4 +1,4 @@
-from .legacy_models import Portfolio
+from .domain import Portfolio
 from .domain import Fill, MarketQuote, Side
 from .pricing import compute_midpoint
 

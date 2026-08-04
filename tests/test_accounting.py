@@ -1,4 +1,4 @@
-from polyedge.legacy_models import Portfolio
+from polyedge.domain import Portfolio
 from polyedge.domain import Fill, MarketQuote, Side
 from polyedge.portfolio import (
     create_portfolio,

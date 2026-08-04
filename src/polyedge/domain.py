@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from enum import Enum
 from math import isfinite
-from typing import Dict, Optional, Tuple
+from typing import Optional
 
 
 class Side(str, Enum):
@@ -213,8 +213,35 @@ class Position:
 
 @dataclass
 class Portfolio:
+    """
+    Mutable accounting state.
+
+    positions uses the existing market-native structure:
+
+    positions[market_id]["YES"]["size"]
+    positions[market_id]["YES"]["avg_price"]
+    positions[market_id]["NO"]["size"]
+    positions[market_id]["NO"]["avg_price"]
+
+    This representation is preserved during the legacy-model cleanup
+    so accounting behavior remains unchanged.
+    """
+
     cash: float
-    positions: Dict[Tuple[str, Side], Position] = field(default_factory=dict)
+    positions: dict = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if (
+            isinstance(self.cash, bool)
+            or not isinstance(self.cash, (int, float))
+        ):
+            raise TypeError("cash must be a finite number")
+
+        if not isfinite(self.cash):
+            raise ValueError("cash must be finite")
+
+        if not isinstance(self.positions, dict):
+            raise TypeError("positions must be a dict")
 
 
 @dataclass(frozen=True)

@@ -1,4 +1,4 @@
-from .legacy_models import Portfolio
+from .domain import Portfolio
 from .domain import MarketQuote
 from .pricing import compute_midpoint, compute_spread
 from .portfolio import (

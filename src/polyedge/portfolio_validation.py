@@ -1,4 +1,4 @@
-from .legacy_models import Portfolio
+from .domain import Portfolio
 
 
 def validate_portfolio_state(portfolio: Portfolio) -> None:

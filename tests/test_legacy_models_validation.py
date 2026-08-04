@@ -1,7 +1,7 @@
 import pytest
 
 from polyedge.domain import Fill, MarketQuote, Side, Signal
-from polyedge.legacy_models import Portfolio
+from polyedge.domain import Portfolio
 
 
 def test_market_state_rejects_crossed_bid_ask():
