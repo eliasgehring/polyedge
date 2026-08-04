@@ -38,3 +38,6 @@ data/archive/
 
 # Private Odds API captures
 data/raw/the_odds_api/
+
+# Private processed Odds API data
+data/processed/the_odds_api/
