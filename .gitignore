@@ -35,3 +35,6 @@ results/figures/
 
 # Old archived experiment outputs
 data/archive/
+
+# Private Odds API captures
+data/raw/the_odds_api/
