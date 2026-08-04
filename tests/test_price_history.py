@@ -20,6 +20,22 @@ def test_selects_latest_price_before_snapshot():
     assert result.age_seconds == 50
 
 
+def test_exact_cutoff_price_is_allowed():
+    result = select_latest_price_before_snapshot(
+        history=[
+            {"t": 199, "p": 0.40},
+            {"t": 200, "p": 0.45},
+        ],
+        snapshot_timestamp=200,
+        max_staleness_seconds=100,
+    )
+
+    assert result.reason is None
+    assert result.price == 0.45
+    assert result.timestamp == 200
+    assert result.age_seconds == 0
+
+
 def test_ignores_future_prices():
     result = select_latest_price_before_snapshot(
         history=[
@@ -73,4 +89,39 @@ def test_invalid_points_do_not_create_price():
     )
 
     assert result.price is None
-    assert result.reason == "no_valid_price_before_snapshot"
+    assert (
+        result.reason
+        == "no_valid_price_before_snapshot"
+    )
+
+
+def test_identical_duplicate_points_are_collapsed():
+    result = select_latest_price_before_snapshot(
+        history=[
+            {"t": 150, "p": 0.45},
+            {"t": 150, "p": 0.45},
+        ],
+        snapshot_timestamp=200,
+        max_staleness_seconds=100,
+    )
+
+    assert result.reason is None
+    assert result.price == 0.45
+    assert result.timestamp == 150
+
+
+def test_conflicting_prices_at_latest_timestamp_are_rejected():
+    result = select_latest_price_before_snapshot(
+        history=[
+            {"t": 150, "p": 0.45},
+            {"t": 150, "p": 0.46},
+        ],
+        snapshot_timestamp=200,
+        max_staleness_seconds=100,
+    )
+
+    assert result.price is None
+    assert (
+        result.reason
+        == "conflicting_prices_at_latest_timestamp"
+    )
