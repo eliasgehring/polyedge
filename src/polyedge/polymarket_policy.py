@@ -13,3 +13,5 @@ SOURCE_SEMANTICS = (
 )
 
 EXECUTION_SEMANTICS = "none"
+
+POLICY_VERSION = "nba_v2_sync_v1"
