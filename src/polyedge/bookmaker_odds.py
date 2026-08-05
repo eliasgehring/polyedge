@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from math import isfinite
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
 
 @dataclass(frozen=True)
@@ -19,6 +19,24 @@ class BookmakerMoneylineQuote:
     away_decimal_odds: float
     home_fair_prob: float
     away_fair_prob: float
+
+
+@dataclass(frozen=True)
+class MoneylineQuoteRejection:
+    event_id: str
+    home_team: str
+    away_team: str
+    bookmaker_key: str
+    market_last_update: datetime
+    home_raw_price: Any
+    away_raw_price: Any
+    reason: str
+
+
+@dataclass(frozen=True)
+class MoneylineParseResult:
+    quotes: Tuple[BookmakerMoneylineQuote, ...]
+    rejections: Tuple[MoneylineQuoteRejection, ...]
 
 
 def parse_utc_timestamp(
@@ -114,13 +132,14 @@ def fair_two_way_probabilities(
 
 def parse_the_odds_api_moneylines(
     payload: Any,
-) -> List[BookmakerMoneylineQuote]:
+) -> MoneylineParseResult:
     if not isinstance(payload, list):
         raise TypeError(
             "The Odds API payload must be a list"
         )
 
     quotes = []
+    rejections = []
 
     for event in payload:
         if not isinstance(event, dict):
@@ -238,14 +257,56 @@ def parse_the_odds_api_moneylines(
                     f"away outcome {away_team!r}"
                 )
 
-            home_decimal_odds = parse_decimal_odds(
-                outcomes_by_name[home_team].get("price"),
-                "home decimal odds",
-            )
-            away_decimal_odds = parse_decimal_odds(
-                outcomes_by_name[away_team].get("price"),
-                "away decimal odds",
-            )
+            home_raw_price = outcomes_by_name[
+                home_team
+            ].get("price")
+            away_raw_price = outcomes_by_name[
+                away_team
+            ].get("price")
+
+            invalid_fields = []
+
+            try:
+                home_decimal_odds = parse_decimal_odds(
+                    home_raw_price,
+                    "home decimal odds",
+                )
+            except (TypeError, ValueError):
+                invalid_fields.append("home")
+
+            try:
+                away_decimal_odds = parse_decimal_odds(
+                    away_raw_price,
+                    "away decimal odds",
+                )
+            except (TypeError, ValueError):
+                invalid_fields.append("away")
+
+            if invalid_fields:
+                if invalid_fields == ["home", "away"]:
+                    reason = (
+                        "invalid_home_and_away_decimal_odds"
+                    )
+                elif invalid_fields == ["home"]:
+                    reason = "invalid_home_decimal_odds"
+                else:
+                    reason = "invalid_away_decimal_odds"
+
+                rejections.append(
+                    MoneylineQuoteRejection(
+                        event_id=event_id,
+                        home_team=home_team,
+                        away_team=away_team,
+                        bookmaker_key=bookmaker_key,
+                        market_last_update=(
+                            market_last_update
+                        ),
+                        home_raw_price=home_raw_price,
+                        away_raw_price=away_raw_price,
+                        reason=reason,
+                    )
+                )
+                continue
 
             (
                 home_fair_prob,
@@ -273,4 +334,7 @@ def parse_the_odds_api_moneylines(
                 )
             )
 
-    return quotes
+    return MoneylineParseResult(
+        quotes=tuple(quotes),
+        rejections=tuple(rejections),
+    )
