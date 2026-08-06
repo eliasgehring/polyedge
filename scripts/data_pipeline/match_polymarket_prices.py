@@ -27,7 +27,6 @@ ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "src"
 sys.path.insert(0, str(SRC))
 
-from polyedge.backtest import run_simulation
 from polyedge.market_matching import select_home_token
 from polyedge.match_manifest import MATCH_MANIFEST_COLUMNS, build_match_manifest_row
 from polyedge.time_semantics import choose_aligned_snapshot_time
