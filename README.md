@@ -2,7 +2,7 @@
 
 PolyEdge is a truth-preserving Python research engine for comparing synchronized bookmaker consensus probabilities with prediction-market probabilities.
 
-Its central question is not “can a backtest print a profit?” It is:
+Its central question is:
 
 > Does the available data support the claimed probability edge under explicit timing, scoring, and source semantics?
 
