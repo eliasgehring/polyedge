@@ -9,12 +9,15 @@ Its central question is not “can a backtest print a profit?” It is:
 ## Evaluator quick start
 
 ```bash
-python -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
-pip install -e .
+python -m pip install --upgrade pip
+python -m pip install -e ".[test]"
 python -m pytest -q
 polyedge research --demo
 ```
+
+Upgrading `pip` before the editable install is deliberate. It avoids legacy `setup.py develop` behavior in older Python 3.9 environments.
 
 The public demo uses a synthetic fixture and prints:
 
@@ -28,8 +31,14 @@ Tradable profitability : NOT ESTABLISHED
 ## Optional dashboard
 
 ```bash
-pip install -e ".[dashboard]"
+python -m pip install -e ".[dashboard]"
 streamlit run streamlit_app.py
+```
+
+To install both evaluator tests and the dashboard in one step:
+
+```bash
+python -m pip install -e ".[test,dashboard]"
 ```
 
 The dashboard imports the same canonical `ResearchSummary` used by the CLI and Markdown report. It does not maintain a second metrics implementation.

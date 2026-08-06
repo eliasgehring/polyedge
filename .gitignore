@@ -41,3 +41,5 @@ data/raw/the_odds_api/
 
 # Private processed Odds API data
 data/processed/the_odds_api/
+*.egg-info/
+.streamlit/
