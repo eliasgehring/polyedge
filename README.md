@@ -1,10 +1,10 @@
 # PolyEdge
 
-PolyEdge is a truth-preserving Python research engine for comparing bookmaker consensus probabilities with prediction-market probabilities.
+PolyEdge is a truth-preserving Python research engine for comparing synchronized bookmaker consensus probabilities with prediction-market probabilities.
 
 Its central question is not “can a backtest print a profit?” It is:
 
-> Does the available data support the claimed probability edge under explicit timing, scoring, execution, and accounting semantics?
+> Does the available data support the claimed probability edge under explicit timing, scoring, and source semantics?
 
 ## Evaluator quick start
 
@@ -16,8 +16,6 @@ python -m pip install -e ".[test]"
 python -m pytest -q
 polyedge research --demo
 ```
-
-Upgrading `pip` before the editable install is deliberate. It avoids legacy `setup.py develop` behavior in older Python 3.9 environments.
 
 The public demo uses a synthetic fixture and prints:
 
@@ -35,7 +33,7 @@ python -m pip install -e ".[dashboard]"
 streamlit run streamlit_app.py
 ```
 
-To install both evaluator tests and the dashboard in one step:
+To install both evaluator tests and the dashboard:
 
 ```bash
 python -m pip install -e ".[test,dashboard]"
@@ -66,7 +64,7 @@ Headline findings:
 - Neither source demonstrated a credible aggregate accuracy advantage.
 - Execution semantics are `none`; tradable profitability is not established.
 
-The committed full-data result is in:
+The committed full-data result is:
 
 ```text
 reports/nba_v2_research_report.md
@@ -114,7 +112,7 @@ HOME is scored once. AWAY is the exact binary complement and is not treated as a
 
 ## Timing and source semantics
 
-The synchronized observation uses a common decision time.
+The synchronized observation uses one common decision time.
 
 Bookmaker probability is derived from eligible fresh bookmaker updates available by that observation time.
 
@@ -143,11 +141,15 @@ The reported intervals use a deterministic game-date-clustered bootstrap:
 
 More bootstrap resamples reduce simulation noise. They do not add observations or strengthen the underlying evidence.
 
-## Main commands
+## Main command
+
+Public evaluator workflow:
 
 ```bash
 polyedge research --demo
 ```
+
+Authorized full-data workflow:
 
 ```bash
 polyedge research \
@@ -155,16 +157,6 @@ polyedge research \
   --resamples 10000 \
   --report reports/reproduced_report.md
 ```
-
-```bash
-polyedge validate
-```
-
-```bash
-polyedge run
-```
-
-`polyedge run` is the legacy exploratory backtest path. It is deliberately separated from the synchronized V2 probability-research result.
 
 ## Repository map
 
@@ -177,6 +169,8 @@ data/demo/                public synthetic evaluator fixture
 reports/                  pinned research reports
 streamlit_app.py          optional read-only dashboard
 ```
+
+The repository retains tested accounting, execution, and signal modules as internal engineering work. They are not exposed by the evaluator CLI and do not support the V2 empirical result.
 
 ## Research standard
 
