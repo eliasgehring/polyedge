@@ -5,8 +5,12 @@ from pathlib import Path
 from typing import Dict, List, Optional, Sequence
 
 from polyedge.discrepancy_analysis import (
-    DiscrepancyObservation,
     parse_discrepancy_observations,
+)
+from polyedge.extremeness_analysis import (
+    ExtremenessAnalysisResult,
+    analyze_extremeness,
+    parse_extremeness_observations,
 )
 from polyedge.forecast_audit import (
     ForecastPopulationAudit,
@@ -60,6 +64,7 @@ class ResearchSummary:
     within_two_points_count: int
     at_least_five_points_count: int
     mean_absolute_discrepancy: float
+    extremeness_analysis: ExtremenessAnalysisResult
     source_semantics: str
     execution_semantics: str
     policy_version: str
@@ -215,6 +220,21 @@ def build_research_summary(
         for row in discrepancy_rows
     ]
 
+    extremeness_rows = (
+        parse_extremeness_observations(
+            rows
+        )
+    )
+
+    extremeness_analysis = (
+        analyze_extremeness(
+            extremeness_rows,
+            population_name="all_synchronized",
+            resamples=resamples,
+            seed=seed,
+        )
+    )
+
     dataset_sha256 = sha256_file(
         dataset_path
     )
@@ -302,6 +322,9 @@ def build_research_summary(
                 absolute_discrepancies
             )
         ),
+        extremeness_analysis=(
+            extremeness_analysis
+        ),
         source_semantics=(
             SOURCE_SEMANTICS
         ),
@@ -332,6 +355,35 @@ def _format_ci(
         + ", "
         + _format_float(upper)
         + "]"
+    )
+
+
+def _format_percentage(
+    value: float,
+) -> str:
+    return f"{value * 100:.2f}%"
+
+
+def _format_optional_float(
+    value: Optional[float],
+) -> str:
+    if value is None:
+        return ""
+
+    return _format_float(
+        value
+    )
+
+
+def _format_optional_ci(
+    interval,
+) -> str:
+    if interval is None:
+        return ""
+
+    return _format_ci(
+        interval.lower,
+        interval.upper,
     )
 
 
@@ -427,6 +479,97 @@ def print_research_summary(
         )
     )
     print()
+    print("PROBABILITY BEHAVIOR")
+    print("-" * 72)
+
+    extremeness = (
+        summary.extremeness_analysis
+    )
+
+    print(
+        "Bookmaker less extreme     : "
+        + str(
+            extremeness.bookmaker_less_extreme_count
+        )
+        + " ("
+        + _format_percentage(
+            extremeness.bookmaker_less_extreme_fraction
+        )
+        + ")"
+    )
+    print(
+        "Equal extremeness          : "
+        + str(
+            extremeness.equal_extremeness_count
+        )
+        + " ("
+        + _format_percentage(
+            extremeness.equal_extremeness_fraction
+        )
+        + ")"
+    )
+    print(
+        "Bookmaker more extreme     : "
+        + str(
+            extremeness.bookmaker_more_extreme_count
+        )
+        + " ("
+        + _format_percentage(
+            extremeness.bookmaker_more_extreme_fraction
+        )
+        + ")"
+    )
+    print(
+        "Mean extremeness gap       : "
+        + _format_float(
+            extremeness
+            .mean_extremeness_gap_bookmaker_minus_polymarket
+        )
+    )
+    print(
+        "Gap meaning                : negative = bookmaker less extreme"
+    )
+    print()
+    print(
+        "Consensus band       n  less-extreme  mean gap      "
+        "Brier diff / clustered 95% CI"
+    )
+
+    for band in extremeness.probability_bands:
+        less_extreme = (
+            ""
+            if (
+                band
+                .bookmaker_less_extreme_fraction
+                is None
+            )
+            else _format_percentage(
+                band
+                .bookmaker_less_extreme_fraction
+            )
+        )
+
+        brier_result = (
+            _format_optional_float(
+                band
+                .mean_brier_score_difference_polymarket_minus_bookmaker
+            )
+            + " "
+            + _format_optional_ci(
+                band
+                .brier_date_clustered_ci
+            )
+        ).rstrip()
+
+        print(
+            f"{band.band_label:<18}"
+            f"{band.count:>4}  "
+            f"{less_extreme:>12}  "
+            f"{_format_optional_float(band.mean_extremeness_gap_bookmaker_minus_polymarket):>12}  "
+            + brier_result
+        )
+
+    print()
     print("CLAIM BOUNDARY")
     print("-" * 72)
     print(
@@ -510,6 +653,129 @@ def build_markdown_report(
             + "`"
         ),
         "",
+        "## Probability behavior",
+        "",
+        (
+            "- Bookmaker less extreme: `"
+            + str(
+                summary
+                .extremeness_analysis
+                .bookmaker_less_extreme_count
+            )
+            + "` (`"
+            + _format_percentage(
+                summary
+                .extremeness_analysis
+                .bookmaker_less_extreme_fraction
+            )
+            + "`)"
+        ),
+        (
+            "- Equal extremeness: `"
+            + str(
+                summary
+                .extremeness_analysis
+                .equal_extremeness_count
+            )
+            + "` (`"
+            + _format_percentage(
+                summary
+                .extremeness_analysis
+                .equal_extremeness_fraction
+            )
+            + "`)"
+        ),
+        (
+            "- Bookmaker more extreme: `"
+            + str(
+                summary
+                .extremeness_analysis
+                .bookmaker_more_extreme_count
+            )
+            + "` (`"
+            + _format_percentage(
+                summary
+                .extremeness_analysis
+                .bookmaker_more_extreme_fraction
+            )
+            + "`)"
+        ),
+        (
+            "- Mean extremeness gap, bookmaker minus Polymarket: `"
+            + _format_float(
+                summary
+                .extremeness_analysis
+                .mean_extremeness_gap_bookmaker_minus_polymarket
+            )
+            + "`"
+        ),
+        "",
+        (
+            "Negative extremeness gaps mean the bookmaker "
+            "forecast was closer to 0.50."
+        ),
+        "",
+        "| Consensus HOME probability | Count | Bookmaker less extreme | Mean extremeness gap | Mean Brier difference | Date-clustered 95% CI | Mean log-loss difference | Date-clustered 95% CI |",
+        "|---|---:|---:|---:|---:|---:|---:|---:|",
+    ]
+
+    for band in (
+        summary
+        .extremeness_analysis
+        .probability_bands
+    ):
+        bookmaker_less_extreme = (
+            ""
+            if (
+                band
+                .bookmaker_less_extreme_fraction
+                is None
+            )
+            else _format_percentage(
+                band
+                .bookmaker_less_extreme_fraction
+            )
+        )
+
+        lines.append(
+            "| "
+            + band.band_label
+            + " | "
+            + str(
+                band.count
+            )
+            + " | "
+            + bookmaker_less_extreme
+            + " | "
+            + _format_optional_float(
+                band
+                .mean_extremeness_gap_bookmaker_minus_polymarket
+            )
+            + " | "
+            + _format_optional_float(
+                band
+                .mean_brier_score_difference_polymarket_minus_bookmaker
+            )
+            + " | "
+            + _format_optional_ci(
+                band
+                .brier_date_clustered_ci
+            )
+            + " | "
+            + _format_optional_float(
+                band
+                .mean_log_loss_difference_polymarket_minus_bookmaker
+            )
+            + " | "
+            + _format_optional_ci(
+                band
+                .log_loss_date_clustered_ci
+            )
+            + " |"
+        )
+
+    lines.extend([
+        "",
         "## Claim boundary",
         "",
         f"- Source semantics: `{summary.source_semantics}`",
@@ -519,7 +785,7 @@ def build_markdown_report(
         "",
         "The Polymarket input is a sampled historical probability series, not a historical order book, bid, ask, trade, or fill.",
         "",
-    ]
+    ])
 
     return "\n".join(
         lines
