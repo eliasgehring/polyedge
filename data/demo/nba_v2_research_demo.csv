@@ -1,0 +1,13 @@
+output_market_id,strict_t_minus_60_eligible,bookmaker_home_fair_probability,bookmaker_away_fair_probability,polymarket_home_probability,polymarket_away_probability,home_probability_edge,away_probability_edge,resolved_home_value,resolved_away_value,source_semantics,execution_semantics,policy_version
+nba_20260101_alpha_vs_beta_home_win,true,0.720000000000,0.280000000000,0.700000000000,0.300000000000,0.020000000000,-0.020000000000,1,0,one_minute_sampled_probability_series,none,nba_v2_sync_v1
+nba_20260101_gamma_vs_delta_home_win,true,0.310000000000,0.690000000000,0.330000000000,0.670000000000,-0.020000000000,0.020000000000,0,1,one_minute_sampled_probability_series,none,nba_v2_sync_v1
+nba_20260102_epsilon_vs_zeta_home_win,true,0.610000000000,0.390000000000,0.600000000000,0.400000000000,0.010000000000,-0.010000000000,1,0,one_minute_sampled_probability_series,none,nba_v2_sync_v1
+nba_20260102_eta_vs_theta_home_win,true,0.440000000000,0.560000000000,0.460000000000,0.540000000000,-0.020000000000,0.020000000000,0,1,one_minute_sampled_probability_series,none,nba_v2_sync_v1
+nba_20260103_iota_vs_kappa_home_win,true,0.550000000000,0.450000000000,0.540000000000,0.460000000000,0.010000000000,-0.010000000000,1,0,one_minute_sampled_probability_series,none,nba_v2_sync_v1
+nba_20260103_lambda_vs_mu_home_win,false,0.380000000000,0.620000000000,0.360000000000,0.640000000000,0.020000000000,-0.020000000000,0,1,one_minute_sampled_probability_series,none,nba_v2_sync_v1
+nba_20260104_nu_vs_xi_home_win,true,0.810000000000,0.190000000000,0.790000000000,0.210000000000,0.020000000000,-0.020000000000,1,0,one_minute_sampled_probability_series,none,nba_v2_sync_v1
+nba_20260104_omicron_vs_pi_home_win,true,0.240000000000,0.760000000000,0.260000000000,0.740000000000,-0.020000000000,0.020000000000,0,1,one_minute_sampled_probability_series,none,nba_v2_sync_v1
+nba_20260105_rho_vs_sigma_home_win,true,0.660000000000,0.340000000000,0.640000000000,0.360000000000,0.020000000000,-0.020000000000,0,1,one_minute_sampled_probability_series,none,nba_v2_sync_v1
+nba_20260105_tau_vs_upsilon_home_win,true,0.470000000000,0.530000000000,0.480000000000,0.520000000000,-0.010000000000,0.010000000000,1,0,one_minute_sampled_probability_series,none,nba_v2_sync_v1
+nba_20260106_phi_vs_chi_home_win,false,0.580000000000,0.420000000000,0.560000000000,0.440000000000,0.020000000000,-0.020000000000,1,0,one_minute_sampled_probability_series,none,nba_v2_sync_v1
+nba_20260106_psi_vs_omega_home_win,true,0.350000000000,0.650000000000,0.370000000000,0.630000000000,-0.020000000000,0.020000000000,0,1,one_minute_sampled_probability_series,none,nba_v2_sync_v1
